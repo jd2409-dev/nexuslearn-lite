@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "ai-tutor",
+      "description": "An AI tutor helping a student.",
+      "imageUrl": "https://images.unsplash.com/photo-1738054040587-3650e0eae34c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxyb2JvdCUyMHRlYWNoZXJ8ZW58MHx8fHwxNzYxNDA0OTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "robot teacher"
+    },
+    {
+      "id": "quiz",
+      "description": "A student taking a quiz.",
+      "imageUrl": "https://images.unsplash.com/photo-1557989048-03456d01a26e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxxdWl6JTIwdGVzdHxlbnwwfHx8fDE3NjEzNzc0ODZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "quiz test"
+    },
+    {
+      "id": "journal",
+      "description": "A person writing in a journal.",
+      "imageUrl": "https://images.unsplash.com/photo-1579017308347-e53e0d2fc5e9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxqb3VybmFsJTIwd3JpdGluZ3xlbnwwfHx8fDE3NjEzMDc5MTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "journal writing"
+    },
+    {
+      "id": "pomodoro",
+      "description": "A tomato-shaped kitchen timer.",
+      "imageUrl": "https://images.unsplash.com/photo-1631217617182-3abab444a537?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cG9tb2Rvcm8lMjB0aW1lcnxlbnwwfHx8fDE3NjE0MDQ5NDF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pomodoro timer"
+    },
+    {
+      "id": "reflection",
+      "description": "A person looking at their reflection in a mirror.",
+      "imageUrl": "https://images.unsplash.com/photo-1696680787753-47aca4cf84ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxyZWZsZWN0aW9uJTIwbWlycm9yfGVufDB8fHx8MTc2MTQwNDk0MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "reflection mirror"
+    },
+    {
+      "id": "textbook",
+      "description": "A stack of textbooks.",
+      "imageUrl": "https://images.unsplash.com/photo-1585521551675-e6e4e4d441f5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx0ZXh0Ym9vayUyMHN0YWNrfGVufDB8fHx8MTc2MTQwNDk0MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "textbook stack"
+    },
+    {
+      "id": "challenges",
+      "description": "A person climbing a mountain.",
+      "imageUrl": "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtb3VudGFpbiUyMGNsaW1ifGVufDB8fHx8MTc2MTM2ODQ5M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mountain climb"
+    }
+  ]
 }
