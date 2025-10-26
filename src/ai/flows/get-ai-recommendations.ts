@@ -4,31 +4,15 @@
  * @fileOverview Provides personalized AI recommendations for learning.
  *
  * - getAiRecommendations - A function that generates personalized learning recommendations.
- * - GetAiRecommendationsInput - The input type for the getAiRecommendations function.
- * - GetAiRecommendationsOutput - The return type for the getAiRecommendations function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-export const GetAiRecommendationsInputSchema = z.object({
-  studentGrade: z.string().describe('The grade of the student.'),
-  studentBoard: z.string().describe('The educational board of the student (e.g., CBSE, ICSE).'),
-  recentPerformance: z.string().describe('A summary of the student\'s recent performance (e.g., "strong in Algebra, weak in Geometry").'),
-});
-export type GetAiRecommendationsInput = z.infer<typeof GetAiRecommendationsInputSchema>;
-
-const RecommendationSchema = z.object({
-  type: z.enum(['review', 'practice', 'focus']).describe('The type of recommendation.'),
-  title: z.string().describe('A short, actionable title for the recommendation.'),
-  reason: z.string().describe('A brief explanation of why this is being recommended.'),
-});
-
-export const GetAiRecommendationsOutputSchema = z.object({
-  recommendations: z.array(RecommendationSchema).describe('A list of 3 personalized learning recommendations.'),
-});
-export type GetAiRecommendationsOutput = z.infer<typeof GetAiRecommendationsOutputSchema>;
-
+import {
+  GetAiRecommendationsInputSchema,
+  GetAiRecommendationsOutputSchema,
+  type GetAiRecommendationsInput,
+  type GetAiRecommendationsOutput,
+} from '@/ai/schemas/recommendations';
 
 export async function getAiRecommendations(
   input: GetAiRecommendationsInput
