@@ -16,6 +16,7 @@ import {
   BookCopy,
   Loader2,
   FileText,
+  CalendarDays,
 } from "lucide-react";
 import Image from "next/image";
 import { doc, collection } from "firebase/firestore";
@@ -64,6 +65,13 @@ const quickAccessItems = [
     href: "/essay-grader",
     icon: FileText,
     image: PlaceHolderImages.find((img) => img.id === "essay-grader"),
+  },
+  {
+    title: "Study Planner",
+    description: "Generate a personalized study plan with AI.",
+    href: "/study-planner",
+    icon: CalendarDays,
+    image: PlaceHolderImages.find((img) => img.id === "study-planner"),
   },
   {
     title: "Learning Journal",

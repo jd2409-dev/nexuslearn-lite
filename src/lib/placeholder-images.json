@@ -47,6 +47,12 @@
       "description": "A person grading a paper with a red pen.",
       "imageUrl": "https://plus.unsplash.com/premium_photo-1683979317454-e43f1b400902?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "grading paper"
+    },
+    {
+      "id": "study-planner",
+      "description": "A desk with a planner, laptop, and coffee.",
+      "imageUrl": "https://images.unsplash.com/photo-1516906571660-d1a3b53f1a43?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzNDE5ODJ8MHwxfHNlYXJjaHwyfHxzdHVkeSUyMHBsYW5uZXJ8ZW58MHx8fHwxNzYxNDA0OTQyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "study planner"
     }
   ]
 }

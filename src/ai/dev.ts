@@ -8,3 +8,4 @@ import '@/ai/flows/get-ai-assistance-with-homework.ts';
 import '@/ai/flows/receive-ai-powered-feedback-on-quiz.ts';
 import '@/ai/flows/get-ai-recommendations.ts';
 import '@/ai/flows/grade-essay.ts';
+import '@/ai/flows/generate-study-plan.ts';
