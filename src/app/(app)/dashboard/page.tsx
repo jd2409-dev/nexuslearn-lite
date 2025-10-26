@@ -14,6 +14,7 @@ import {
   Star,
   Upload,
   BookCopy,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
 import { doc, collection } from "firebase/firestore";
@@ -37,6 +38,8 @@ import {
 } from "@/components/ui/table";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
+import { getAiRecommendations } from "@/ai/flows/get-ai-recommendations";
+import { useEffect, useState } from "react";
 
 const quickAccessItems = [
   {
@@ -76,25 +79,62 @@ const quickAccessItems = [
   },
 ];
 
-const studyChallenges = [
-    { title: "Complete 3 Pomodoro sessions", xp: 50 },
-    { title: "Score 80%+ on a quiz", xp: 100 },
-    { title: "Write a journal entry", xp: 20 },
-]
+
+const iconMap: { [key: string]: React.ElementType } = {
+    review: BookCopy,
+    practice: ClipboardCheck,
+    focus: Timer,
+    default: Lightbulb
+};
+
 
 export default function Dashboard() {
   const { user } = useUser();
   const firestore = useFirestore();
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [loadingRecs, setLoadingRecs] = useState(true);
 
-  const userDocRef = useMemoFirebase(() => 
+  const userDocRef = useMemoFirebase(() =>
     user ? doc(firestore, `users/${user.uid}`) : null
   , [firestore, user]);
   const { data: userData } = useDoc(userDocRef);
 
-  const achievementsCollectionRef = useMemoFirebase(() => 
+  const achievementsCollectionRef = useMemoFirebase(() =>
     user ? collection(firestore, `users/${user.uid}/achievements`) : null
   , [firestore, user]);
   const { data: achievements } = useCollection(achievementsCollectionRef);
+
+  const studyGoalsCollectionRef = useMemoFirebase(() =>
+    user ? collection(firestore, `users/${user.uid}/studyGoals`) : null
+    , [firestore, user]);
+  const { data: studyGoals } = useCollection(studyGoalsCollectionRef);
+
+   useEffect(() => {
+    if (userData) {
+      setLoadingRecs(true);
+      const input = {
+        studentGrade: userData.grade,
+        studentBoard: userData.board,
+        recentPerformance: "mixed",
+      };
+      getAiRecommendations(input)
+        .then(response => {
+          setRecommendations(response.recommendations);
+          setLoadingRecs(false);
+        })
+        .catch(err => {
+            console.error("Error fetching AI recommendations", err);
+            setLoadingRecs(false);
+        });
+    }
+  }, [userData]);
+
+
+  const studyChallenges = studyGoals?.map(goal => ({
+      title: goal.goalDescription,
+      xp: 50, // Assuming a fixed XP for now
+      completed: goal.completed,
+  })) || [];
 
 
   return (
@@ -194,47 +234,34 @@ export default function Dashboard() {
                   </Link>
                 </Button>
               </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className=" flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
-                  <div className="p-2 bg-primary/10 rounded-md">
-                    <BookCopy className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="grid gap-1">
-                    <p className="text-sm font-medium leading-none">
-                      Review "Cellular Respiration"
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Your quiz scores indicate a weak area.
-                    </p>
-                  </div>
-                </div>
-                <div className=" flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
-                  <div className="p-2 bg-primary/10 rounded-md">
-                    <Timer className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="grid gap-1">
-                    <p className="text-sm font-medium leading-none">
-                      Try a 45-min Pomodoro session
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Improve focus on Physics numericals.
-                    </p>
-                  </div>
-                </div>
-                 <div className=" flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
-                  <div className="p-2 bg-primary/10 rounded-md">
-                    <ClipboardCheck className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="grid gap-1">
-                    <p className="text-sm font-medium leading-none">
-                      Take a 5-mark question quiz
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Practice long-form answers in History.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
+               <CardContent className="grid gap-4">
+                {loadingRecs ? (
+                    <div className="flex items-center justify-center p-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                ) : recommendations.length > 0 ? (
+                  recommendations.map((rec, index) => {
+                    const Icon = iconMap[rec.type] || iconMap.default;
+                    return (
+                        <div key={index} className=" flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
+                        <div className="p-2 bg-primary/10 rounded-md">
+                            <Icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <div className="grid gap-1">
+                            <p className="text-sm font-medium leading-none">
+                            {rec.title}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                            {rec.reason}
+                            </p>
+                        </div>
+                        </div>
+                    );
+                  })
+                ) : (
+                    <p className="text-sm text-muted-foreground p-4 text-center">No recommendations available right now.</p>
+                )}
+                </CardContent>
             </Card>
             <Card className="mt-4">
                 <CardHeader>
@@ -250,15 +277,20 @@ export default function Dashboard() {
                         </TableHeader>
                         <TableBody>
                             {studyChallenges.map(challenge => (
-                                <TableRow key={challenge.title}>
+                                <TableRow key={challenge.title} className={challenge.completed ? 'text-muted-foreground line-through' : ''}>
                                     <TableCell>
                                         <div className="font-medium">{challenge.title}</div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Badge variant="outline" className="text-accent-foreground border-accent">{challenge.xp} XP</Badge>
+                                        <Badge variant={challenge.completed ? 'secondary' : 'outline'} className="text-accent-foreground border-accent">{challenge.xp} XP</Badge>
                                     </TableCell>
                                 </TableRow>
                             ))}
+                             {studyChallenges.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={2} className="text-center text-muted-foreground">No study challenges for today.</TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>
