@@ -47,10 +47,10 @@ export default function AppSidebar() {
             <Tooltip key={item.href}>
               <TooltipTrigger asChild>
                 <Link
-                  href={`/dashboard${item.href === '/dashboard' ? '' : item.href}`}
+                  href={item.href}
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8",
-                    pathname.startsWith(`/dashboard${item.href}`) || (pathname === '/dashboard' && item.href === '/dashboard')
+                    pathname === item.href
                       ? "bg-accent text-accent-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )}

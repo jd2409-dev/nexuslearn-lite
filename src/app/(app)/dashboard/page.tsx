@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Activity,
@@ -14,6 +16,7 @@ import {
   BookCopy,
 } from "lucide-react";
 import Image from "next/image";
+import { doc, collection } from "firebase/firestore";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,40 +36,41 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 
 const quickAccessItems = [
   {
     title: "AI Tutor",
     description: "Get instant help with homework and complex topics.",
-    href: "/dashboard/aichat",
+    href: "/aichat",
     icon: Bot,
     image: PlaceHolderImages.find((img) => img.id === "ai-tutor"),
   },
   {
     title: "Generate a Quiz",
     description: "Create practice quizzes for any subject.",
-    href: "/dashboard/quiz",
+    href: "/quiz",
     icon: ClipboardCheck,
     image: PlaceHolderImages.find((img) => img.id === "quiz"),
   },
   {
     title: "Learning Journal",
     description: "Organize your notes and reflections.",
-    href: "/dashboard/journal",
+    href: "/journal",
     icon: BookOpen,
     image: PlaceHolderImages.find((img) => img.id === "journal"),
   },
   {
     title: "Pomodoro Timer",
     description: "Focus your study sessions for maximum efficiency.",
-    href: "/dashboard/pomodoro",
+    href: "/pomodoro",
     icon: Timer,
     image: PlaceHolderImages.find((img) => img.id === "pomodoro"),
   },
   {
     title: "Mistake Analysis",
     description: "Review past quizzes and learn from your mistakes.",
-    href: "/dashboard/reflection",
+    href: "/reflection",
     icon: Lightbulb,
     image: PlaceHolderImages.find((img) => img.id === "reflection"),
   },
@@ -79,6 +83,20 @@ const studyChallenges = [
 ]
 
 export default function Dashboard() {
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const userDocRef = useMemoFirebase(() => 
+    user ? doc(firestore, `users/${user.uid}`) : null
+  , [firestore, user]);
+  const { data: userData } = useDoc(userDocRef);
+
+  const achievementsCollectionRef = useMemoFirebase(() => 
+    user ? collection(firestore, `users/${user.uid}/achievements`) : null
+  , [firestore, user]);
+  const { data: achievements } = useCollection(achievementsCollectionRef);
+
+
   return (
     <div className="flex-1 space-y-4">
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
@@ -88,10 +106,7 @@ export default function Dashboard() {
               <Star className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">45,231</div>
-              <p className="text-xs text-muted-foreground">
-                +20.1% from last month
-              </p>
+              <div className="text-2xl font-bold">{userData?.xp || 0}</div>
             </CardContent>
           </Card>
           <Card>
@@ -100,10 +115,7 @@ export default function Dashboard() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,280</div>
-              <p className="text-xs text-muted-foreground">
-                +180 since last week
-              </p>
+              <div className="text-2xl font-bold">{userData?.coins || 0}</div>
             </CardContent>
           </Card>
           <Card>
@@ -112,10 +124,7 @@ export default function Dashboard() {
               <Trophy className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12 / 50</div>
-              <p className="text-xs text-muted-foreground">
-                'Quiz Master' unlocked
-              </p>
+              <div className="text-2xl font-bold">{achievements?.length || 0} / 50</div>
             </CardContent>
           </Card>
           <Card>

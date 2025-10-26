@@ -14,9 +14,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAuth, useUser } from "@/firebase";
+import { useAuth, useUser, setDocumentNonBlocking } from "@/firebase";
 import { initiateEmailSignIn, initiateEmailSignUp } from "@/firebase/non-blocking-login";
 import { useRouter } from "next/navigation";
+import { doc } from "firebase/firestore";
+import { useFirestore } from "@/firebase/provider";
 
 
 const features = [
@@ -61,6 +63,7 @@ const features = [
 
 const AuthDialog = ({ onOpenChange }: { onOpenChange: (open: boolean) => void }) => {
     const auth = useAuth();
+    const firestore = useFirestore();
     const router = useRouter();
     const [loginEmail, setLoginEmail] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
@@ -69,6 +72,7 @@ const AuthDialog = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     const [signupFullName, setSignupFullName] = useState("");
     const [signupBoard, setSignupBoard] = useState("");
     const [signupGrade, setSignupGrade] = useState("");
+    const { user } = useUser();
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,16 +82,25 @@ const AuthDialog = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
         initiateEmailSignUp(auth, signupEmail, signupPassword);
-        // Here you would typically also save the additional user info (name, board, grade) to Firestore
     }
 
-    const { user } = useUser();
     useEffect(() => {
         if (user) {
+             const userRef = doc(firestore, "users", user.uid);
+             const userData = {
+                id: user.uid,
+                name: signupFullName || user.displayName,
+                email: signupEmail || user.email,
+                board: signupBoard,
+                grade: signupGrade,
+                xp: 0,
+                coins: 0,
+            };
+            setDocumentNonBlocking(userRef, userData, { merge: true });
             onOpenChange(false);
             router.push("/dashboard");
         }
-    }, [user, router, onOpenChange]);
+    }, [user, router, onOpenChange, firestore, signupFullName, signupEmail, signupBoard, signupGrade]);
 
     return (
         <Dialog onOpenChange={onOpenChange}>
@@ -216,25 +229,7 @@ export default function LandingPage() {
                         <Button size="lg">Get Started for Free</Button>
                     </DialogTrigger>
                     <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle className="text-2xl">Welcome</DialogTitle>
-                            <DialogDescription>
-                            Create an account to start your personalized learning journey.
-                            </DialogDescription>
-                        </DialogHeader>
-                         <Tabs defaultValue="signup">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="login">Log In</TabsTrigger>
-                                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="login">
-                                {/* The full auth form is inside AuthDialog, this is just for triggering */}
-                                <p className="text-center text-sm text-muted-foreground mt-4">Already have an account? Select the Log In tab.</p>
-                            </TabsContent>
-                             <TabsContent value="signup">
-                                <p className="text-center text-sm text-muted-foreground mt-4">New here? Fill out the details in the Sign Up tab.</p>
-                            </TabsContent>
-                        </Tabs>
+                        <AuthDialog onOpenChange={setAuthDialogOpen} />
                     </DialogContent>
                 </Dialog>
             </div>
@@ -296,3 +291,4 @@ export default function LandingPage() {
       </footer>
     </div>
   );
+}

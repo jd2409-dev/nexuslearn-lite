@@ -38,11 +38,11 @@ const navItems = [
 
 const pageTitles: { [key: string]: string } = {
   "/dashboard": "Dashboard",
-  "/dashboard/aichat": "AI Tutor",
-  "/dashboard/quiz": "Quiz Generator",
-  "/dashboard/journal": "Learning Journal",
-  "/dashboard/pomodoro": "Pomodoro Timer",
-  "/dashboard/reflection": "Reflection",
+  "/aichat": "AI Tutor",
+  "/quiz": "Quiz Generator",
+  "/journal": "Learning Journal",
+  "/pomodoro": "Pomodoro Timer",
+  "/reflection": "Reflection",
 };
 
 export default function Header() {
@@ -51,7 +51,7 @@ export default function Header() {
   
   const getBreadcrumbs = () => {
     const paths = pathname.split('/').filter(p => p);
-    if (paths.length <= 1) return null;
+    if (paths.length === 0 || pathname === '/dashboard') return null;
     return (
       <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="/dashboard" className="hover:text-foreground">Dashboard</Link>
@@ -82,7 +82,7 @@ export default function Header() {
             {navItems.map(item => (
               <Link
                 key={item.href}
-                href={`/dashboard${item.href === '/dashboard' ? '' : item.href}`}
+                href={item.href}
                 className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
               >
                 <item.icon className="h-5 w-5" />
@@ -94,7 +94,7 @@ export default function Header() {
       </Sheet>
 
       <div className="flex-1">
-        {getBreadcrumbs() || <h1 className="font-semibold text-lg md:hidden">{title}</h1>}
+        {getBreadcrumbs() || <h1 className="font-semibold text-lg">{title}</h1>}
       </div>
 
       <div className="relative flex-1 md:grow-0">

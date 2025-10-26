@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { getAiAssistanceWithHomework, GetAiAssistanceWithHomeworkOutput } from "@/ai/flows/get-ai-assistance-with-homework";
 
-import { Bot, Loader2, Send, User } from "lucide-react";
+import { Bot, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -55,7 +55,7 @@ export default function AiChatPage() {
       setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
     } finally {
       setIsLoading(false);
-      form.reset();
+      form.reset({ question: '', subject: values.subject, gradeLevel: values.gradeLevel, relevantMaterial: ''});
     }
   }
 
