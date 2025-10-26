@@ -1,225 +1,163 @@
 /**
- * @fileoverview Firestore Security Rules for NexusLearn AI.
+ * @fileoverview Firestore Security Rules for NexusLearn Lite.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for all data stored in Firestore.
- * Each user can only access their own data, ensuring privacy and data integrity.
+ * This ruleset enforces a strict user-ownership model for all data. Each user has a dedicated data tree under `/users/{userId}`, and only the authenticated user can read or write data within their own tree.
  *
  * Data Structure:
- * All user-specific data is nested under the `/users/{userId}` path. This includes profile information,
- * achievements, study goals, quizzes, journal entries, pomodoro sessions, and mistake analyses.
+ * All data is nested under the `/users/{userId}` collection. This includes user profiles, achievements, study goals, quizzes, journal entries, pomodoro sessions, and mistake analyses.
  *
  * Key Security Decisions:
- * - Users can only create, read, update, and delete their own data.
- * - No user listing is allowed.
- * - Data consistency is enforced between the path and the document's internal `userId` field on create.
- * - Critical relational fields like `userId` are immutable on update.
+ * - User listing is disallowed to protect user privacy.
+ * - All write operations are strictly controlled based on user ownership.
+ * - Data consistency is enforced where necessary to ensure that data within a user's path belongs to that user.
+ *
+ * Denormalization for Authorization:
+ *  - Path-based ownership under /users/{userId} avoids the need for `get()` calls to verify ownership.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Defines whether a user is signed in.
+     * @description Checks if the request is authenticated.
      */
     function isSignedIn() {
       return request.auth != null;
     }
 
     /**
-     * @description Defines whether the current user is the owner of the resource.
+     * @description Checks if the authenticated user ID matches the provided user ID.
      */
     function isOwner(userId) {
-      return request.auth.uid == userId;
+      return isSignedIn() && request.auth.uid == userId;
     }
 
     /**
-     * @description Defines whether the current user is the owner of the resource and the resource exists.
+     * @description Checks if the authenticated user is the owner of the existing document.
      */
     function isExistingOwner(userId) {
-      return isOwner(userId) && exists(resource);
+        return isOwner(userId) && resource != null;
     }
 
     /**
-     * @description Enforces that on create, the resource.data.id must be the same as the userId in the path
-     */
-    function isValidNewOwner(userId) {
-      return request.resource.data.userId == userId;
-    }
-
-    /**
-     * @description Validates that the resource.data.id is immutable
-     */
-    function isValidExistingOwner(userId) {
-        return request.resource.data.userId == resource.data.userId;
-    }
-
-    /**
-     * @description Security rules for the /users/{userId} collection.
+     * @description Rules for the /users/{userId} collection.
      * @path /users/{userId}
-     * @allow (create) - Allow user to create their own profile if the userId matches their auth UID.
-     * @allow (get) - Allow user to read their own profile.
-     * @allow (update) - Allow user to update their own profile.
-     * @allow (delete) - Allow user to delete their own profile.
-     * @deny (create) - Deny user from creating a profile with a mismatched userId.
-     * @deny (get) - Deny user from reading another user's profile.
-     * @deny (update) - Deny user from updating another user's profile.
-     * @deny (delete) - Deny user from deleting another user's profile.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create their own profile.
+     * @deny (create) User ABC cannot create a profile for user DEF.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId} {
       allow get: if isOwner(userId);
-      allow list: if false;
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow list: if false; // User listing is not allowed.
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Security rules for the /users/{userId}/achievements/{achievementId} collection.
+     * @description Rules for the /users/{userId}/achievements/{achievementId} collection.
      * @path /users/{userId}/achievements/{achievementId}
-     * @allow (create) - Allow user to create an achievement for themselves.
-     * @allow (get) - Allow user to read their own achievements.
-     * @allow (update) - Allow user to update their own achievements.
-     * @allow (delete) - Allow user to delete their own achievements.
-     * @deny (create) - Deny user from creating an achievement for another user.
-     * @deny (get) - Deny user from reading another user's achievements.
-     * @deny (update) - Deny user from updating another user's achievements.
-     * @deny (delete) - Deny user from deleting another user's achievements.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create an achievement in their own profile.
+     * @deny (create) User ABC cannot create an achievement for user DEF.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId}/achievements/{achievementId} {
       allow get: if isOwner(userId);
-      allow list: if false;
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Security rules for the /users/{userId}/studyGoals/{studyGoalId} collection.
+     * @description Rules for the /users/{userId}/studyGoals/{studyGoalId} collection.
      * @path /users/{userId}/studyGoals/{studyGoalId}
-     * @allow (create) - Allow user to create a study goal for themselves.
-     * @allow (get) - Allow user to read their own study goals.
-     * @allow (update) - Allow user to update their own study goals.
-     * @allow (delete) - Allow user to delete their own study goals.
-     * @deny (create) - Deny user from creating a study goal for another user.
-     * @deny (get) - Deny user from reading another user's study goals.
-     * @deny (update) - Deny user from updating another user's study goals.
-     * @deny (delete) - Deny user from deleting another user's study goals.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create a study goal in their own profile.
+     * @deny (create) User ABC cannot create a study goal for user DEF.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId}/studyGoals/{studyGoalId} {
       allow get: if isOwner(userId);
-      allow list: if false;
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Security rules for the /users/{userId}/quizzes/{quizId} collection.
+     * @description Rules for the /users/{userId}/quizzes/{quizId} collection.
      * @path /users/{userId}/quizzes/{quizId}
-     * @allow (create) - Allow user to create a quiz for themselves.
-     * @allow (get) - Allow user to read their own quizzes.
-     * @allow (update) - Allow user to update their own quizzes.
-     * @allow (delete) - Allow user to delete their own quizzes.
-     * @deny (create) - Deny user from creating a quiz for another user.
-     * @deny (get) - Deny user from reading another user's quizzes.
-     * @deny (update) - Deny user from updating another user's quizzes.
-     * @deny (delete) - Deny user from deleting another user's quizzes.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create a quiz in their own profile.
+     * @deny (create) User ABC cannot create a quiz for user DEF.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId}/quizzes/{quizId} {
       allow get: if isOwner(userId);
-      allow list: if false;
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Security rules for the /users/{userId}/quizzes/{quizId}/questions/{questionId} collection.
+     * @description Rules for the /users/{userId}/quizzes/{quizId}/questions/{questionId} collection.
      * @path /users/{userId}/quizzes/{quizId}/questions/{questionId}
-     * @allow (create) - Allow user to create a question for their own quiz.
-     * @allow (get) - Allow user to read questions in their own quiz.
-     * @allow (update) - Allow user to update questions in their own quiz.
-     * @allow (delete) - Allow user to delete questions in their own quiz.
-     * @deny (create) - Deny user from creating a question for another user's quiz.
-     * @deny (get) - Deny user from reading questions in another user's quiz.
-     * @deny (update) - Deny user from updating questions in another user's quiz.
-     * @deny (delete) - Deny user from deleting questions in another user's quiz.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create a question in their own quiz.
+     * @deny (create) User ABC cannot create a question for user DEF's quiz.
+     * @principle Enforces document ownership for writes, inherited from the quiz.
      */
     match /users/{userId}/quizzes/{quizId}/questions/{questionId} {
       allow get: if isOwner(userId);
-      allow list: if false;
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Security rules for the /users/{userId}/journalEntries/{journalEntryId} collection.
+     * @description Rules for the /users/{userId}/journalEntries/{journalEntryId} collection.
      * @path /users/{userId}/journalEntries/{journalEntryId}
-     * @allow (create) - Allow user to create a journal entry for themselves.
-     * @allow (get) - Allow user to read their own journal entries.
-     * @allow (update) - Allow user to update their own journal entries.
-     * @allow (delete) - Allow user to delete their own journal entries.
-     * @deny (create) - Deny user from creating a journal entry for another user.
-     * @deny (get) - Deny user from reading another user's journal entries.
-     * @deny (update) - Deny user from updating another user's journal entries.
-     * @deny (delete) - Deny user from deleting another user's journal entries.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create a journal entry in their own profile.
+     * @deny (create) User ABC cannot create a journal entry for user DEF.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId}/journalEntries/{journalEntryId} {
       allow get: if isOwner(userId);
-      allow list: if false;
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Security rules for the /users/{userId}/pomodoroSessions/{pomodoroSessionId} collection.
+     * @description Rules for the /users/{userId}/pomodoroSessions/{pomodoroSessionId} collection.
      * @path /users/{userId}/pomodoroSessions/{pomodoroSessionId}
-     * @allow (create) - Allow user to create a pomodoro session for themselves.
-     * @allow (get) - Allow user to read their own pomodoro sessions.
-     * @allow (update) - Allow user to update their own pomodoro sessions.
-     * @allow (delete) - Allow user to delete their own pomodoro sessions.
-     * @deny (create) - Deny user from creating a pomodoro session for another user.
-     * @deny (get) - Deny user from reading another user's pomodoro sessions.
-     * @deny (update) - Deny user from updating another user's pomodoro sessions.
-     * @deny (delete) - Deny user from deleting another user's pomodoro sessions.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create a pomodoro session in their own profile.
+     * @deny (create) User ABC cannot create a pomodoro session for user DEF.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId}/pomodoroSessions/{pomodoroSessionId} {
       allow get: if isOwner(userId);
-      allow list: if false;
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Security rules for the /users/{userId}/mistakeAnalyses/{mistakeAnalysisId} collection.
+     * @description Rules for the /users/{userId}/mistakeAnalyses/{mistakeAnalysisId} collection.
      * @path /users/{userId}/mistakeAnalyses/{mistakeAnalysisId}
-     * @allow (create) - Allow user to create a mistake analysis for themselves.
-     * @allow (get) - Allow user to read their own mistake analyses.
-     * @allow (update) - Allow user to update their own mistake analyses.
-     * @allow (delete) - Allow user to delete their own mistake analyses.
-     * @deny (create) - Deny user from creating a mistake analysis for another user.
-     * @deny (get) - Deny user from reading another user's mistake analyses.
-     * @deny (update) - Deny user from updating another user's mistake analyses.
-     * @deny (delete) - Deny user from deleting another user's mistake analyses.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create a mistake analysis in their own profile.
+     * @deny (create) User ABC cannot create a mistake analysis for user DEF.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId}/mistakeAnalyses/{mistakeAnalysisId} {
       allow get: if isOwner(userId);
-      allow list: if false;
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
   }
 }
