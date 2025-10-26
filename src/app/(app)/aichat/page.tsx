@@ -19,8 +19,6 @@ import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
   question: z.string().min(10, { message: "Please ask a detailed question." }),
-  subject: z.string().min(1, { message: "Please select a subject." }),
-  gradeLevel: z.string().min(1, { message: "Please select a grade." }),
   relevantMaterial: z.string().optional(),
 });
 
@@ -37,8 +35,6 @@ export default function AiChatPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       question: "",
-      subject: "physics",
-      gradeLevel: "10",
       relevantMaterial: "",
     },
   });
@@ -64,50 +60,6 @@ export default function AiChatPage() {
       <div className="flex flex-col h-full">
         <header className="flex items-center justify-between border-b px-4 py-2">
             <h1 className="text-xl font-bold">AI Tutor</h1>
-            <div className="flex items-center gap-4">
-              <Form {...form}>
-                <form className="flex items-center gap-4">
-                   <FormField
-                    control={form.control}
-                    name="subject"
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="h-8 w-[120px]"><SelectValue placeholder="Subject" /></SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="physics">Physics</SelectItem>
-                            <SelectItem value="chemistry">Chemistry</SelectItem>
-                            <SelectItem value="biology">Biology</SelectItem>
-                            <SelectItem value="math">Math</SelectItem>
-                            <SelectItem value="history">History</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="gradeLevel"
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="h-8 w-[120px]"><SelectValue placeholder="Grade" /></SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {[...Array(5)].map((_, i) => (
-                              <SelectItem key={i+8} value={`${i+8}`}>{`Grade ${i+8}`}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </div>
         </header>
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-6 max-w-4xl mx-auto">
@@ -116,7 +68,7 @@ export default function AiChatPage() {
                     <Bot className="h-16 w-16 text-muted-foreground" />
                     <h2 className="mt-6 text-xl font-semibold">Ready to Help!</h2>
                     <p className="mt-2 text-center text-muted-foreground">
-                    Select a subject and grade, then ask any academic question.
+                      Ask me any academic question.
                     </p>
                 </div>
             )}
@@ -189,6 +141,17 @@ export default function AiChatPage() {
                             <FormItem className="flex-1">
                                 <FormControl>
                                     <Textarea placeholder="Type your question here..." {...field} rows={1} className="min-h-0 resize-none"/>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                        />
+                     <FormField
+                        control={form.control}
+                        name="relevantMaterial"
+                        render={({ field }) => (
+                            <FormItem className="flex-1">
+                                <FormControl>
+                                    <Textarea placeholder="Add any relevant material or context here..." {...field} rows={1} className="min-h-0 resize-none"/>
                                 </FormControl>
                             </FormItem>
                         )}

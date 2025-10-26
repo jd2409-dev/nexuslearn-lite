@@ -12,8 +12,8 @@ import {z} from 'genkit';
 
 const GetAiAssistanceWithHomeworkInputSchema = z.object({
   question: z.string().describe('The academic question for which assistance is needed.'),
-  subject: z.string().describe('The subject of the question.'),
-  gradeLevel: z.string().describe('The grade level of the student.'),
+  subject: z.string().optional().describe('The subject of the question.'),
+  gradeLevel: z.string().optional().describe('The grade level of the student.'),
   relevantMaterial: z
     .string()
     .optional()
@@ -50,8 +50,12 @@ const prompt = ai.definePrompt({
   output: {schema: GetAiAssistanceWithHomeworkOutputSchema},
   prompt: `You are an AI tutor helping a student with their homework.
 
+  {{#if gradeLevel}}
   The student is in grade level: {{{gradeLevel}}}.
+  {{/if}}
+  {{#if subject}}
   The subject is: {{{subject}}}.
+  {{/if}}
 
   Here is the question:
   {{{question}}}
