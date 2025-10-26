@@ -8,13 +8,13 @@ import { AppLogo } from "@/components/icons";
 import { BookOpen, Bot, ClipboardCheck, Lightbulb, Timer, Trophy } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAuth } from "@/firebase";
+import { useAuth, useUser } from "@/firebase";
 import { initiateEmailSignIn, initiateEmailSignUp } from "@/firebase/non-blocking-login";
 import { useRouter } from "next/navigation";
 
@@ -59,7 +59,7 @@ const features = [
 ];
 
 
-const AuthDialog = () => {
+const AuthDialog = ({ onOpenChange }: { onOpenChange: (open: boolean) => void }) => {
     const auth = useAuth();
     const router = useRouter();
     const [loginEmail, setLoginEmail] = useState("");
@@ -73,18 +73,24 @@ const AuthDialog = () => {
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         initiateEmailSignIn(auth, loginEmail, loginPassword);
-        router.push("/dashboard");
     }
 
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
         initiateEmailSignUp(auth, signupEmail, signupPassword);
         // Here you would typically also save the additional user info (name, board, grade) to Firestore
-        router.push("/dashboard");
     }
 
+    const { user } = useUser();
+    useEffect(() => {
+        if (user) {
+            onOpenChange(false);
+            router.push("/dashboard");
+        }
+    }, [user, router, onOpenChange]);
+
     return (
-        <Dialog>
+        <Dialog onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
                 <Button>Log In / Sign Up</Button>
             </DialogTrigger>
@@ -171,6 +177,17 @@ const AuthDialog = () => {
 
 
 export default function LandingPage() {
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const { user } = useUser();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard");
+    }
+  }, [user, router]);
+
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -180,7 +197,7 @@ export default function LandingPage() {
             <span className="font-headline text-xl">NexusLearn Lite</span>
           </Link>
           <nav className="ml-auto flex items-center gap-4">
-            <AuthDialog />
+            <AuthDialog onOpenChange={setAuthDialogOpen} />
           </nav>
         </div>
       </header>
@@ -194,7 +211,7 @@ export default function LandingPage() {
               NexusLearn Lite is your personal AI-powered learning companion. Master any subject with smart tools designed for modern students.
             </p>
             <div className="mt-8">
-                <Dialog>
+                <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                     <DialogTrigger asChild>
                         <Button size="lg">Get Started for Free</Button>
                     </DialogTrigger>
@@ -211,10 +228,11 @@ export default function LandingPage() {
                                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
                             </TabsList>
                             <TabsContent value="login">
-                                {/* Login Form Here */}
+                                {/* The full auth form is inside AuthDialog, this is just for triggering */}
+                                <p className="text-center text-sm text-muted-foreground mt-4">Already have an account? Select the Log In tab.</p>
                             </TabsContent>
                              <TabsContent value="signup">
-                                {/* Signup Form Here */}
+                                <p className="text-center text-sm text-muted-foreground mt-4">New here? Fill out the details in the Sign Up tab.</p>
                             </TabsContent>
                         </Tabs>
                     </DialogContent>
@@ -278,4 +296,3 @@ export default function LandingPage() {
       </footer>
     </div>
   );
-}
