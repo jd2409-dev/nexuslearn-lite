@@ -19,6 +19,7 @@ const GradeEssayOutputSchema = z.object({
   clarity: z.number().min(0).max(10).describe('Score for clarity, from 0 to 10.'),
   argument: z.number().min(0).max(10).describe('Score for the strength of the argument, from 0 to 10.'),
   originality: z.number().min(0).max(10).describe('Score for originality, from 0 to 10. A lower score suggests AI generation.'),
+  aiGenerated: z.boolean().describe('Whether the essay is likely AI-generated.'),
   feedback: z.string().describe('Constructive feedback for the essay.'),
 });
 export type GradeEssayOutput = z.infer<typeof GradeEssayOutputSchema>;
@@ -36,6 +37,7 @@ const prompt = ai.definePrompt({
   1.  **Clarity**: How clear and easy to understand is the writing? Is the language precise? (0-10)
   2.  **Argument**: How strong, well-supported, and coherent is the main argument or thesis? (0-10)
   3.  **Originality**: How original and human-like is the text? A low score indicates it is likely AI-generated. A high score suggests human authorship. (0-10)
+  4.  **AI Generated**: Based on the originality score and your analysis, determine if the essay is likely AI-generated. Set 'aiGenerated' to true if the originality score is below 5, otherwise false.
 
   Finally, provide concise, constructive feedback to help the student improve.
 
