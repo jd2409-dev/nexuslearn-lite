@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
-  title: 'NexusLearn AI',
+  title: 'NexusLearn Lite',
   description: 'Your personal AI-powered learning companion.',
 };
 

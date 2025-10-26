@@ -4,7 +4,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user of the NexusLearn AI application.",
+      "description": "Represents a user of the NexusLearn Lite application.",
       "properties": {
         "id": {
           "type": "string",
@@ -499,6 +499,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn AI application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `UserAchievement`, `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `UserAchievement`, `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
   }
 }

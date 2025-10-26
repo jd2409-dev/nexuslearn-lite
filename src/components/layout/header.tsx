@@ -47,7 +47,7 @@ const pageTitles: { [key: string]: string } = {
 
 export default function Header() {
   const pathname = usePathname();
-  const title = pageTitles[pathname] || "NexusLearn AI";
+  const title = pageTitles[pathname] || "NexusLearn Lite";
   
   const getBreadcrumbs = () => {
     const paths = pathname.split('/').filter(p => p);
@@ -77,7 +77,7 @@ export default function Header() {
               className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
             >
               <AppLogo className="h-5 w-5 transition-all group-hover:scale-110" />
-              <span className="sr-only">NexusLearn AI</span>
+              <span className="sr-only">NexusLearn Lite</span>
             </Link>
             {navItems.map(item => (
               <Link

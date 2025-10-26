@@ -177,7 +177,7 @@ export default function LandingPage() {
         <div className="container flex h-14 items-center">
           <Link href="#" className="flex items-center gap-2 font-bold">
             <AppLogo className="h-6 w-6 text-primary" />
-            <span className="font-headline text-xl">NexusLearn AI</span>
+            <span className="font-headline text-xl">NexusLearn Lite</span>
           </Link>
           <nav className="ml-auto flex items-center gap-4">
             <AuthDialog />
@@ -191,7 +191,7 @@ export default function LandingPage() {
               Supercharge Your Studies with AI
             </h1>
             <p className="mx-auto mt-4 max-w-[700px] text-lg text-muted-foreground md:text-xl">
-              NexusLearn AI is your personal AI-powered learning companion. Master any subject with smart tools designed for modern students.
+              NexusLearn Lite is your personal AI-powered learning companion. Master any subject with smart tools designed for modern students.
             </p>
             <div className="mt-8">
                 <Dialog>
@@ -264,7 +264,7 @@ export default function LandingPage() {
         <div className="container flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AppLogo className="h-5 w-5 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} NexusLearn AI. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} NexusLearn Lite. All rights reserved.</p>
           </div>
           <div className="flex items-center gap-4">
              <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
