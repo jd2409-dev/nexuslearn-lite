@@ -37,8 +37,8 @@ export default function AiChatPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       question: "",
-      subject: "",
-      gradeLevel: "",
+      subject: "physics",
+      gradeLevel: "10",
       relevantMaterial: "",
     },
   });
@@ -55,25 +55,68 @@ export default function AiChatPage() {
       setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
     } finally {
       setIsLoading(false);
-      form.reset({ question: '', subject: values.subject, gradeLevel: values.gradeLevel, relevantMaterial: ''});
+      form.reset({ ...form.getValues(), question: '', relevantMaterial: '' });
     }
   }
 
   return (
-    <div className="grid h-[calc(100vh-8rem)] w-full md:grid-cols-[1fr_350px]">
-      <div className="flex flex-col">
+    <div className="h-[calc(100vh-8rem)] w-full">
+      <div className="flex flex-col h-full">
         <header className="flex items-center justify-between border-b px-4 py-2">
             <h1 className="text-xl font-bold">AI Tutor</h1>
-            <p className="text-sm text-muted-foreground">Instant homework help</p>
+            <div className="flex items-center gap-4">
+              <Form {...form}>
+                <form className="flex items-center gap-4">
+                   <FormField
+                    control={form.control}
+                    name="subject"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-8 w-[120px]"><SelectValue placeholder="Subject" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="physics">Physics</SelectItem>
+                            <SelectItem value="chemistry">Chemistry</SelectItem>
+                            <SelectItem value="biology">Biology</SelectItem>
+                            <SelectItem value="math">Math</SelectItem>
+                            <SelectItem value="history">History</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="gradeLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-8 w-[120px]"><SelectValue placeholder="Grade" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {[...Array(5)].map((_, i) => (
+                              <SelectItem key={i+8} value={`${i+8}`}>{`Grade ${i+8}`}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+            </div>
         </header>
         <ScrollArea className="flex-1 p-4">
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-4xl mx-auto">
             {messages.length === 0 && (
                 <div className="flex h-full min-h-[50vh] flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center">
                     <Bot className="h-16 w-16 text-muted-foreground" />
                     <h2 className="mt-6 text-xl font-semibold">Ready to Help!</h2>
                     <p className="mt-2 text-center text-muted-foreground">
-                    Ask any academic question and I'll do my best to answer. Fill out the form to get started.
+                    Select a subject and grade, then ask any academic question.
                     </p>
                 </div>
             )}
@@ -84,7 +127,7 @@ export default function AiChatPage() {
                      <AvatarFallback><Bot className="h-4 w-4" /></AvatarFallback>
                   </Avatar>
                 )}
-                <div className={`max-w-xl rounded-lg px-4 py-3 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-card'}`}>
+                <div className={`max-w-2xl rounded-lg px-4 py-3 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-card'}`}>
                   {typeof message.content === 'string' ? (
                     <p>{message.content}</p>
                   ) : (
@@ -135,110 +178,30 @@ export default function AiChatPage() {
             )}
           </div>
         </ScrollArea>
-        <div className="border-t p-4">
+        <div className="border-t p-4 bg-background">
+            <div className="max-w-4xl mx-auto">
              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-center gap-2">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-start gap-2">
                     <FormField
                         control={form.control}
                         name="question"
                         render={({ field }) => (
                             <FormItem className="flex-1">
                                 <FormControl>
-                                    <Input placeholder="Type your question here..." {...field} />
+                                    <Textarea placeholder="Type your question here..." {...field} rows={1} className="min-h-0 resize-none"/>
                                 </FormControl>
                             </FormItem>
                         )}
                         />
-                    <Button type="submit" disabled={isLoading} size="icon">
+                    <Button type="submit" disabled={isLoading}>
                         <Send className="h-4 w-4" />
+                        <span className="sr-only">Send</span>
                     </Button>
                 </form>
             </Form>
+            </div>
         </div>
       </div>
-      <Card className="hidden md:flex flex-col border-l rounded-none">
-        <CardHeader>
-          <CardTitle>Question Details</CardTitle>
-          <CardDescription>Provide context for a better answer.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="question"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Question</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="e.g., Explain Newton's First Law of Motion." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subject</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="physics">Physics</SelectItem>
-                        <SelectItem value="chemistry">Chemistry</SelectItem>
-                        <SelectItem value="biology">Biology</SelectItem>
-                        <SelectItem value="math">Math</SelectItem>
-                        <SelectItem value="history">History</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="gradeLevel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Grade</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                       <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Select a grade" /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {[...Array(5)].map((_, i) => (
-                          <SelectItem key={i+8} value={`${i+8}`}>{`Grade ${i+8}`}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="relevantMaterial"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Relevant Material (Optional)</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Add any context, like from your textbook." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait</> : "Ask AI Tutor"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
     </div>
   );
 }
