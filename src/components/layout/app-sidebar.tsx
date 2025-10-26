@@ -17,6 +17,7 @@ import {
   Timer,
   Lightbulb,
   Settings,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
   { href: "/aichat", icon: BotMessageSquare, label: "AI Tutor" },
   { href: "/quiz", icon: ClipboardCheck, label: "Quizzes" },
+  { href: "/essay-grader", icon: FileText, label: "Essay Grader" },
   { href: "/journal", icon: Book, label: "Journal" },
   { href: "/pomodoro", icon: Timer, label: "Pomodoro" },
   { href: "/reflection", icon: Lightbulb, label: "Reflection" },

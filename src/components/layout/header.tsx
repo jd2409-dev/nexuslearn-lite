@@ -11,6 +11,7 @@ import {
   Timer,
   Lightbulb,
   Search,
+  FileText,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -31,6 +32,7 @@ const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
   { href: "/aichat", icon: BotMessageSquare, label: "AI Tutor" },
   { href: "/quiz", icon: ClipboardCheck, label: "Quizzes" },
+  { href: "/essay-grader", icon: FileText, label: "Essay Grader" },
   { href: "/journal", icon: Book, label: "Journal" },
   { href: "/pomodoro", icon: Timer, label: "Pomodoro" },
   { href: "/reflection", icon: Lightbulb, label: "Reflection" },
@@ -40,6 +42,7 @@ const pageTitles: { [key: string]: string } = {
   "/dashboard": "Dashboard",
   "/aichat": "AI Tutor",
   "/quiz": "Quiz Generator",
+  "/essay-grader": "Essay Grader",
   "/journal": "Learning Journal",
   "/pomodoro": "Pomodoro Timer",
   "/reflection": "Reflection",

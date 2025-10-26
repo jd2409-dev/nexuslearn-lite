@@ -15,6 +15,7 @@ import {
   Upload,
   BookCopy,
   Loader2,
+  FileText,
 } from "lucide-react";
 import Image from "next/image";
 import { doc, collection } from "firebase/firestore";
@@ -40,6 +41,7 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { getAiRecommendations } from "@/ai/flows/get-ai-recommendations";
 import { useEffect, useState } from "react";
+import type { GetAiRecommendationsOutput } from "@/ai/schemas/recommendations";
 
 const quickAccessItems = [
   {
@@ -55,6 +57,13 @@ const quickAccessItems = [
     href: "/quiz",
     icon: ClipboardCheck,
     image: PlaceHolderImages.find((img) => img.id === "quiz"),
+  },
+  {
+    title: "Essay Grader",
+    description: "Get AI-powered feedback on your writing.",
+    href: "/essay-grader",
+    icon: FileText,
+    image: PlaceHolderImages.find((img) => img.id === "essay-grader"),
   },
   {
     title: "Learning Journal",
@@ -91,7 +100,7 @@ const iconMap: { [key: string]: React.ElementType } = {
 export default function Dashboard() {
   const { user } = useUser();
   const firestore = useFirestore();
-  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<GetAiRecommendationsOutput['recommendations']>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
 
   const userDocRef = useMemoFirebase(() =>
