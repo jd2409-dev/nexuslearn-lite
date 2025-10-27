@@ -19,6 +19,11 @@ export default function PomodoroPage() {
   const [isActive, setIsActive] = useState(false);
   const [cycles, setCycles] = useState(0);
 
+  useEffect(() => {
+    switchMode(mode);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workDuration, shortBreakDuration, longBreakDuration]);
+
   const totalDuration = (mode === 'work' ? workDuration : mode === 'shortBreak' ? shortBreakDuration : longBreakDuration) * 60;
 
   const switchMode = (newMode: Mode) => {
@@ -69,12 +74,6 @@ export default function PomodoroPage() {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, time]);
-
-  useEffect(() => {
-    // Reset timer when durations change
-    switchMode(mode);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workDuration, shortBreakDuration, longBreakDuration]);
 
 
   const toggleTimer = () => {
