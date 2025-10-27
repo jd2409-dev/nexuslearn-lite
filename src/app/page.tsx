@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AppLogo } from "@/components/icons";
-import { BookOpen, Bot, ClipboardCheck, Lightbulb, Timer, Trophy } from "lucide-react";
+import { BookOpen, Bot, ClipboardCheck, Lightbulb, Timer } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useState, useEffect } from "react";
@@ -54,8 +54,8 @@ const features = [
   },
   {
     title: "Gamified Learning",
-    description: "Earn XP, coins, and achievements as you learn. Stay motivated with daily challenges and track your progress.",
-    icon: Trophy,
+    description: "Earn XP and coins as you learn. Stay motivated with daily challenges and track your progress.",
+    icon: Star,
     image: PlaceHolderImages.find((img) => img.id === "challenges"),
   },
 ];
@@ -292,3 +292,4 @@ export default function LandingPage() {
     </div>
   );
 }
+    

@@ -51,67 +51,6 @@
         "grade"
       ]
     },
-    "Achievement": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Achievement",
-      "type": "object",
-      "description": "Represents an achievement a user can earn.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the achievement."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the achievement."
-        },
-        "description": {
-          "type": "string",
-          "description": "A description of how to earn the achievement."
-        },
-        "rewardCoins": {
-          "type": "number",
-          "description": "The number of coins awarded for earning the achievement."
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "description",
-        "rewardCoins"
-      ]
-    },
-    "UserAchievement": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UserAchievement",
-      "type": "object",
-      "description": "Represents the association between a user and an achievement.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the user achievement record."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User. (Relationship: User 1:N UserAchievement)"
-        },
-        "achievementId": {
-          "type": "string",
-          "description": "Reference to the Achievement. (Relationship: Achievement 1:N UserAchievement)"
-        },
-        "earnedDate": {
-          "type": "string",
-          "description": "The date the achievement was earned.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "achievementId",
-        "earnedDate"
-      ]
-    },
     "StudyGoal": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "StudyGoal",
@@ -361,26 +300,6 @@
         }
       },
       {
-        "path": "/users/{userId}/achievements/{achievementId}",
-        "definition": {
-          "entityName": "UserAchievement",
-          "schema": {
-            "$ref": "#/backend/entities/UserAchievement"
-          },
-          "description": "Stores achievements earned by a user. Path-based ownership ensures only the authenticated user can access their achievements.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            },
-            {
-              "name": "achievementId",
-              "description": "The unique identifier for the user achievement record."
-            }
-          ]
-        }
-      },
-      {
         "path": "/users/{userId}/studyGoals/{studyGoalId}",
         "definition": {
           "entityName": "StudyGoal",
@@ -505,8 +424,7 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `UserAchievement`, `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
   }
 }
-
     

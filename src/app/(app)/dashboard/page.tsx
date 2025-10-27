@@ -3,14 +3,12 @@
 
 import Link from "next/link";
 import {
-  Activity,
   ArrowUpRight,
   Bot,
   BookOpen,
   ClipboardCheck,
   Timer,
   Lightbulb,
-  Trophy,
   DollarSign,
   Star,
   Upload,
@@ -120,11 +118,6 @@ export default function Dashboard() {
   , [firestore, user]);
   const { data: userData } = useDoc(userDocRef);
 
-  const achievementsCollectionRef = useMemoFirebase(() =>
-    user ? collection(firestore, `users/${user.uid}/achievements`) : null
-  , [firestore, user]);
-  const { data: achievements } = useCollection(achievementsCollectionRef);
-
   const studyGoalsCollectionRef = useMemoFirebase(() =>
     user ? collection(firestore, `users/${user.uid}/studyGoals`) : null
     , [firestore, user]);
@@ -178,7 +171,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 space-y-4">
-        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">XP Points</CardTitle>
@@ -195,27 +188,6 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{userData?.coins || 0}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Achievements</CardTitle>
-              <Trophy className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{achievements?.length || 0} / 50</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Study Streak</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">5 Days</div>
-              <p className="text-xs text-muted-foreground">
-                Keep it up!
-              </p>
             </CardContent>
           </Card>
         </div>
