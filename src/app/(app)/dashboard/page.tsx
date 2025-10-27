@@ -18,6 +18,7 @@ import {
   Loader2,
   FileText,
   CalendarDays,
+  RefreshCw,
 } from "lucide-react";
 import Image from "next/image";
 import { doc, collection, updateDoc, increment } from "firebase/firestore";
@@ -43,7 +44,7 @@ import {
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { getAiRecommendations } from "@/ai/flows/get-ai-recommendations";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type { GetAiRecommendationsOutput } from "@/ai/schemas/recommendations";
 
 const quickAccessItems = [
@@ -112,6 +113,7 @@ export default function Dashboard() {
   const firestore = useFirestore();
   const [recommendations, setRecommendations] = useState<GetAiRecommendationsOutput['recommendations']>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
+  const [recsError, setRecsError] = useState<string | null>(null);
 
   const userDocRef = useMemoFirebase(() =>
     user ? doc(firestore, `users/${user.uid}`) : null
@@ -128,6 +130,29 @@ export default function Dashboard() {
     , [firestore, user]);
   const { data: studyGoals } = useCollection(studyGoalsCollectionRef);
 
+  const fetchRecommendations = useCallback(() => {
+    if (userData) {
+        setLoadingRecs(true);
+        setRecsError(null);
+        const input = {
+            studentGrade: userData.grade,
+            studentBoard: userData.board,
+            recentPerformance: "mixed",
+        };
+        getAiRecommendations(input)
+            .then(response => {
+                setRecommendations(response.recommendations);
+            })
+            .catch(err => {
+                console.error("Error fetching AI recommendations", err);
+                setRecsError("Could not load recommendations. The AI service may be temporarily unavailable.");
+            })
+            .finally(() => {
+                setLoadingRecs(false);
+            });
+    }
+  }, [userData]);
+
    useEffect(() => {
     if (userData && userDocRef) {
       // Daily Login XP
@@ -138,25 +163,10 @@ export default function Dashboard() {
           lastLoginDate: today,
         });
       }
-
-      // AI Recommendations
-      setLoadingRecs(true);
-      const input = {
-        studentGrade: userData.grade,
-        studentBoard: userData.board,
-        recentPerformance: "mixed",
-      };
-      getAiRecommendations(input)
-        .then(response => {
-          setRecommendations(response.recommendations);
-          setLoadingRecs(false);
-        })
-        .catch(err => {
-            console.error("Error fetching AI recommendations", err);
-            setLoadingRecs(false);
-        });
+      // Initial fetch for AI Recommendations
+      fetchRecommendations();
     }
-  }, [userData, userDocRef]);
+  }, [userData, userDocRef, fetchRecommendations]);
 
 
   const studyChallenges = studyGoals?.map(goal => ({
@@ -268,6 +278,14 @@ export default function Dashboard() {
                     <div className="flex items-center justify-center p-8">
                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                     </div>
+                ) : recsError ? (
+                  <div className="flex flex-col items-center justify-center p-8 text-center">
+                    <p className="text-sm text-destructive mb-4">{recsError}</p>
+                    <Button variant="outline" size="sm" onClick={fetchRecommendations}>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Try Again
+                    </Button>
+                  </div>
                 ) : recommendations.length > 0 ? (
                   recommendations.map((rec, index) => {
                     const Icon = iconMap[rec.type] || iconMap.default;
