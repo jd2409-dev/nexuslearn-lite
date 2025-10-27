@@ -20,37 +20,29 @@ export default function PomodoroPage() {
   const [cycles, setCycles] = useState(0);
 
   useEffect(() => {
-    switchMode(mode);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workDuration, shortBreakDuration, longBreakDuration]);
+    let newTime;
+    if (mode === 'work') {
+      newTime = workDuration * 60;
+    } else if (mode === 'shortBreak') {
+      newTime = shortBreakDuration * 60;
+    } else {
+      newTime = longBreakDuration * 60;
+    }
+    setTime(newTime);
+    setIsActive(false);
+  }, [mode, workDuration, shortBreakDuration, longBreakDuration]);
 
   const totalDuration = (mode === 'work' ? workDuration : mode === 'shortBreak' ? shortBreakDuration : longBreakDuration) * 60;
 
   const switchMode = (newMode: Mode) => {
     setMode(newMode);
-    setIsActive(false);
-    switch (newMode) {
-      case 'work':
-        setTime(workDuration * 60);
-        break;
-      case 'shortBreak':
-        setTime(shortBreakDuration * 60);
-        break;
-      case 'longBreak':
-        setTime(longBreakDuration * 60);
-        break;
-    }
   };
 
   const handleTimerEnd = () => {
-    setIsActive(false);
-    // In a real app, you would play a sound here.
-    // Audio is not supported in this environment.
-
     if (mode === 'work') {
       const newCycles = cycles + 1;
       setCycles(newCycles);
-      if (newCycles % 4 === 0) {
+      if (newCycles > 0 && newCycles % 4 === 0) {
         switchMode('longBreak');
       } else {
         switchMode('shortBreak');
@@ -72,7 +64,7 @@ export default function PomodoroPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, time]);
 
 
@@ -81,8 +73,7 @@ export default function PomodoroPage() {
   };
 
   const resetTimer = () => {
-    setIsActive(false);
-    switchMode('work');
+    setMode('work');
     setCycles(0);
   };
 
@@ -92,7 +83,7 @@ export default function PomodoroPage() {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  const progress = (time / totalDuration) * 100;
+  const progress = totalDuration > 0 ? (time / totalDuration) * 100 : 0;
 
   const modeConfig = {
     work: { text: "Focus Session", icon: Briefcase },
@@ -159,15 +150,15 @@ export default function PomodoroPage() {
             <CardContent className="grid grid-cols-3 gap-4 pb-4">
               <div className="grid gap-2">
                 <Label htmlFor="work">Focus (min)</Label>
-                <Input id="work" type="number" value={workDuration} onChange={(e) => setWorkDuration(Number(e.target.value))} />
+                <Input id="work" type="number" value={workDuration} onChange={(e) => setWorkDuration(Math.max(1, Number(e.target.value)))} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="short">Short Break (min)</Label>
-                <Input id="short" type="number" value={shortBreakDuration} onChange={(e) => setShortBreakDuration(Number(e.target.value))} />
+                <Input id="short" type="number" value={shortBreakDuration} onChange={(e) => setShortBreakDuration(Math.max(1, Number(e.target.value)))} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="long">Long Break (min)</Label>
-                <Input id="long" type="number" value={longBreakDuration} onChange={(e) => setLongBreakDuration(Number(e.target.value))} />
+                <Input id="long" type="number" value={longBreakDuration} onChange={(e) => setLongBreakDuration(Math.max(1, Number(e.target.value)))} />
               </div>
             </CardContent>
           </Card>
