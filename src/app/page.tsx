@@ -274,19 +274,9 @@ export default function LandingPage() {
 
       </main>
       <footer className="border-t py-6">
-        <div className="container flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AppLogo className="h-5 w-5 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} NexusLearn Lite. All rights reserved.</p>
-          </div>
-          <div className="flex items-center gap-4">
-             <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
-                Terms of Service
-            </Link>
-             <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
-                Privacy Policy
-            </Link>
-          </div>
+        <div className="container flex flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
+            <p>Built by JD Vinod</p>
+            <p>For support, contact nexuslearnlite@gmail.com</p>
         </div>
       </footer>
     </div>

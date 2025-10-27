@@ -13,6 +13,10 @@ export default function AppLayout({
         <Header />
         <main className="flex flex-1 flex-col gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           {children}
+          <footer className="mt-auto border-t py-4 text-center text-sm text-muted-foreground">
+            <p>Built by JD Vinod</p>
+            <p>For support, contact nexuslearnlite@gmail.com</p>
+          </footer>
         </main>
       </div>
     </div>
