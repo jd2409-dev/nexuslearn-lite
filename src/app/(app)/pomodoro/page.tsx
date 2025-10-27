@@ -32,27 +32,25 @@ export default function PomodoroPage() {
     setIsActive(false);
   }, [mode, workDuration, shortBreakDuration, longBreakDuration]);
 
-  const totalDuration = (mode === 'work' ? workDuration : mode === 'shortBreak' ? shortBreakDuration : longBreakDuration) * 60;
-
   const switchMode = (newMode: Mode) => {
     setMode(newMode);
   };
 
-  const handleTimerEnd = () => {
-    if (mode === 'work') {
-      const newCycles = cycles + 1;
-      setCycles(newCycles);
-      if (newCycles > 0 && newCycles % 4 === 0) {
-        switchMode('longBreak');
-      } else {
-        switchMode('shortBreak');
-      }
-    } else {
-      switchMode('work');
-    }
-  };
-
   useEffect(() => {
+    const handleTimerEnd = () => {
+      if (mode === 'work') {
+        const newCycles = cycles + 1;
+        setCycles(newCycles);
+        if (newCycles > 0 && newCycles % 4 === 0) {
+          switchMode('longBreak');
+        } else {
+          switchMode('shortBreak');
+        }
+      } else {
+        switchMode('work');
+      }
+    };
+    
     let interval: NodeJS.Timeout | null = null;
     if (isActive && time > 0) {
       interval = setInterval(() => {
@@ -64,9 +62,7 @@ export default function PomodoroPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, time]);
-
+  }, [isActive, time, cycles, mode]);
 
   const toggleTimer = () => {
     setIsActive(!isActive);
@@ -83,6 +79,7 @@ export default function PomodoroPage() {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
+  const totalDuration = (mode === 'work' ? workDuration : mode === 'shortBreak' ? shortBreakDuration : longBreakDuration) * 60;
   const progress = totalDuration > 0 ? (time / totalDuration) * 100 : 0;
 
   const modeConfig = {
