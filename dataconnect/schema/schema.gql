@@ -1,0 +1,43 @@
+type User @table {
+  displayName: String!
+  createdAt: Timestamp!
+  email: String
+  photoUrl: String
+}
+
+type StudySet @table {
+  user: User!
+  name: String!
+  content: String!
+  createdAt: Timestamp!
+  description: String
+  topic: String
+}
+
+type Question @table {
+  studySet: StudySet!
+  text: String!
+  type: String!
+  createdAt: Timestamp!
+  correctAnswer: String
+  options: [String]
+  explanation: String
+}
+
+type Quiz @table {
+  user: User!
+  studySet: StudySet!
+  takenAt: Timestamp!
+  score: Int!
+  durationMinutes: Int!
+  feedbackSummary: String
+}
+
+type Answer @table {
+  quiz: Quiz!
+  question: Question!
+  userAnswer: String!
+  isCorrect: Boolean!
+  answeredAt: Timestamp!
+  feedback: String
+}

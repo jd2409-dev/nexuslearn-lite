@@ -53,7 +53,22 @@ const getAiRecommendationsFlow = ai.defineFlow(
     outputSchema: GetAiRecommendationsOutputSchema,
   },
   async input => {
-    const {output} = await recommendationsPrompt(input);
-    return output!;
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const {output} = await recommendationsPrompt(input);
+        return output!;
+      } catch (e: any) {
+        if (e.message.includes('503 Service Unavailable') && retries > 1) {
+          retries--;
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retrying
+        } else {
+          throw e;
+        }
+      }
+    }
+    // This part should not be reachable if retries are configured
+    // but it's here to satisfy TypeScript's need for a return path.
+    throw new Error('Failed to get recommendations after multiple retries.');
   }
 );
