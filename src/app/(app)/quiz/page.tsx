@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -6,6 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { generateQuizFromTopic } from "@/ai/flows/generate-quiz-from-topic";
 import { receiveAiPoweredFeedbackOnQuiz } from "@/ai/flows/receive-ai-powered-feedback-on-quiz";
+import { useUser, useFirestore, useMemoFirebase } from "@/firebase";
+import { doc, updateDoc, increment } from "firebase/firestore";
+
 
 import { Loader2, Wand2, Lightbulb, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Textarea } from "@/components/ui/textarea";
 
 const quizFormSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters." }),
@@ -38,6 +43,13 @@ export default function QuizPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [feedback, setFeedback] = useState<string[]>([]);
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
+
+  const { user } = useUser();
+  const firestore = useFirestore();
+  
+  const userDocRef = useMemoFirebase(() => 
+    user ? doc(firestore, `users/${user.uid}`) : null
+  , [firestore, user]);
 
   const form = useForm<z.infer<typeof quizFormSchema>>({
     resolver: zodResolver(quizFormSchema),
@@ -96,15 +108,29 @@ export default function QuizPage() {
   };
   
   const handleSubmitQuiz = async () => {
+    let correctAnswers = 0;
     const submittedQuestions = quizQuestions.map(q => {
       let isCorrect = false;
       if (q.userAnswer) {
           const userAnswerFormatted = q.userAnswer.trim().toLowerCase();
           const correctAnswerFormatted = q.answer.trim().toLowerCase();
-          isCorrect = userAnswerFormatted === correctAnswerFormatted || userAnswerFormatted.startsWith(correctAnswerFormatted.charAt(0));
+          isCorrect = userAnswerFormatted === correctAnswerFormatted || (q.options && userAnswerFormatted.startsWith(correctAnswerFormatted.charAt(0).toLowerCase()));
+      }
+      if (isCorrect) {
+          correctAnswers++;
       }
       return { ...q, isCorrect };
     });
+
+    const scorePercentage = (correctAnswers / quizQuestions.length) * 100;
+
+    if (userDocRef && scorePercentage > 50) {
+        await updateDoc(userDocRef, {
+            coins: increment(100)
+        });
+    }
+
+
     setQuizQuestions(submittedQuestions);
     setIsSubmitted(true);
 
@@ -276,3 +302,5 @@ export default function QuizPage() {
     </div>
   );
 }
+
+    

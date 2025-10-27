@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -19,7 +20,8 @@ import {
   CalendarDays,
 } from "lucide-react";
 import Image from "next/image";
-import { doc, collection } from "firebase/firestore";
+import { doc, collection, updateDoc, increment } from "firebase/firestore";
+import { format } from 'date-fns';
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -127,7 +129,17 @@ export default function Dashboard() {
   const { data: studyGoals } = useCollection(studyGoalsCollectionRef);
 
    useEffect(() => {
-    if (userData) {
+    if (userData && userDocRef) {
+      // Daily Login XP
+      const today = format(new Date(), 'yyyy-MM-dd');
+      if (userData.lastLoginDate !== today) {
+        updateDoc(userDocRef, {
+          xp: increment(10),
+          lastLoginDate: today,
+        });
+      }
+
+      // AI Recommendations
       setLoadingRecs(true);
       const input = {
         studentGrade: userData.grade,
@@ -144,7 +156,7 @@ export default function Dashboard() {
             setLoadingRecs(false);
         });
     }
-  }, [userData]);
+  }, [userData, userDocRef]);
 
 
   const studyChallenges = studyGoals?.map(goal => ({
@@ -317,3 +329,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+    
