@@ -21,25 +21,21 @@ export default function PomodoroPage() {
 
   const totalDuration = (mode === 'work' ? workDuration : mode === 'shortBreak' ? shortBreakDuration : longBreakDuration) * 60;
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (isActive && time > 0) {
-      interval = setInterval(() => {
-        setTime((prevTime) => prevTime - 1);
-      }, 1000);
-    } else if (isActive && time === 0) {
-      handleTimerEnd();
+  const switchMode = (newMode: Mode) => {
+    setMode(newMode);
+    setIsActive(false);
+    switch (newMode) {
+      case 'work':
+        setTime(workDuration * 60);
+        break;
+      case 'shortBreak':
+        setTime(shortBreakDuration * 60);
+        break;
+      case 'longBreak':
+        setTime(longBreakDuration * 60);
+        break;
     }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isActive, time]);
-
-   useEffect(() => {
-    // Reset timer when durations change
-    switchMode(mode);
-  }, [workDuration, shortBreakDuration, longBreakDuration]);
-
+  };
 
   const handleTimerEnd = () => {
     setIsActive(false);
@@ -58,22 +54,28 @@ export default function PomodoroPage() {
       switchMode('work');
     }
   };
-  
-  const switchMode = (newMode: Mode) => {
-    setMode(newMode);
-    setIsActive(false);
-    switch (newMode) {
-      case 'work':
-        setTime(workDuration * 60);
-        break;
-      case 'shortBreak':
-        setTime(shortBreakDuration * 60);
-        break;
-      case 'longBreak':
-        setTime(longBreakDuration * 60);
-        break;
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (isActive && time > 0) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (isActive && time === 0) {
+      handleTimerEnd();
     }
-  };
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, time]);
+
+  useEffect(() => {
+    // Reset timer when durations change
+    switchMode(mode);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workDuration, shortBreakDuration, longBreakDuration]);
+
 
   const toggleTimer = () => {
     setIsActive(!isActive);
