@@ -1,13 +1,11 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { Timer, Play, Pause, RotateCcw, Settings, Briefcase, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 
 type Mode = 'work' | 'shortBreak' | 'longBreak';
 
@@ -36,6 +34,12 @@ export default function PomodoroPage() {
       if (interval) clearInterval(interval);
     };
   }, [isActive, time]);
+
+   useEffect(() => {
+    // Reset timer when durations change
+    switchMode(mode);
+  }, [workDuration, shortBreakDuration, longBreakDuration]);
+
 
   const handleTimerEnd = () => {
     setIsActive(false);
@@ -77,8 +81,7 @@ export default function PomodoroPage() {
 
   const resetTimer = () => {
     setIsActive(false);
-    setTime(workDuration * 60);
-    setMode('work');
+    switchMode('work');
     setCycles(0);
   };
 
@@ -91,9 +94,9 @@ export default function PomodoroPage() {
   const progress = (time / totalDuration) * 100;
 
   const modeConfig = {
-    work: { text: "Focus Session", icon: Briefcase, color: "bg-primary" },
-    shortBreak: { text: "Short Break", icon: Coffee, color: "bg-green-500" },
-    longBreak: { text: "Long Break", icon: Coffee, color: "bg-blue-500" },
+    work: { text: "Focus Session", icon: Briefcase },
+    shortBreak: { text: "Short Break", icon: Coffee },
+    longBreak: { text: "Long Break", icon: Coffee },
   };
 
   return (
@@ -114,7 +117,7 @@ export default function PomodoroPage() {
             <svg className="h-full w-full" viewBox="0 0 100 100">
                 <circle className="stroke-current text-secondary" strokeWidth="4" cx="50" cy="50" r="45" fill="transparent"></circle>
                 <circle
-                    className="stroke-current text-primary"
+                    className="stroke-current text-primary transition-all duration-1000 ease-linear"
                     strokeWidth="4"
                     strokeDasharray="283"
                     strokeDashoffset={283 - (progress / 100) * 283}
@@ -126,7 +129,7 @@ export default function PomodoroPage() {
                 ></circle>
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-6xl font-bold font-code">{formatTime(time)}</div>
+                <div className="text-6xl font-bold font-mono">{formatTime(time)}</div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                     {modeConfig[mode].icon && <modeConfig[mode].icon className="h-4 w-4" />}
                     <span>{modeConfig[mode].text}</span>
