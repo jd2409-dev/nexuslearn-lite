@@ -31,11 +31,7 @@ export default function PomodoroPage() {
     setTime(newTime);
     setIsActive(false);
   }, [mode, workDuration, shortBreakDuration, longBreakDuration]);
-
-  const switchMode = (newMode: Mode) => {
-    setMode(newMode);
-  };
-
+  
   useEffect(() => {
     const handleTimerEnd = () => {
       if (mode === 'work') {
@@ -63,6 +59,10 @@ export default function PomodoroPage() {
       if (interval) clearInterval(interval);
     };
   }, [isActive, time, cycles, mode]);
+
+  const switchMode = (newMode: Mode) => {
+    setMode(newMode);
+  };
 
   const toggleTimer = () => {
     setIsActive(!isActive);
