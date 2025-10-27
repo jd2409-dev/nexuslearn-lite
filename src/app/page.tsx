@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AppLogo } from "@/components/icons";
-import { BookOpen, Bot, ClipboardCheck, Lightbulb, Timer } from "lucide-react";
+import { BookOpen, Bot, ClipboardCheck, Lightbulb, Timer, Star } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useState, useEffect } from "react";
