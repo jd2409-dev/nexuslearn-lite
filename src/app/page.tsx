@@ -5,9 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AppLogo } from "@/components/icons";
-import { BookOpen, Bot, ClipboardCheck, Lightbulb, Timer, Star } from "lucide-react";
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { BookOpen, Bot, ClipboardCheck, Lightbulb, Timer, Star, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -87,6 +85,7 @@ const AuthDialog = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
                 email: signupEmail || user.email,
                 board: signupBoard,
                 grade: signupGrade,
+                lastLoginDate: new Date().toISOString().split('T')[0],
             };
             setDocumentNonBlocking(userRef, userData, { merge: true });
             onOpenChange(false);
