@@ -12,11 +12,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAuth, useUser, setDocumentNonBlocking } from "@/firebase";
-import { initiateEmailSignIn, initiateEmailSignUp } from "@/firebase/non-blocking-login";
+import { useAuth, useUser } from "@/firebase";
+import { initiateEmailSignIn } from "@/firebase/non-blocking-login";
 import { useRouter } from "next/navigation";
-import { doc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 
 const features = [
@@ -71,27 +72,36 @@ const AuthDialog = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
         initiateEmailSignIn(auth, loginEmail, loginPassword);
     }
 
-    const handleSignup = (e: React.FormEvent) => {
-        e.preventDefault();
-        initiateEmailSignUp(auth, signupEmail, signupPassword);
-    }
+    const handleSignup = async (e: React.FormEvent) => {
+      e.preventDefault();
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
+        const newUser = userCredential.user;
+        if (newUser) {
+          const userRef = doc(firestore, "users", newUser.uid);
+          const userData = {
+            id: newUser.uid,
+            name: signupFullName,
+            email: signupEmail,
+            board: signupBoard,
+            grade: signupGrade,
+            lastLoginDate: new Date().toISOString().split('T')[0],
+          };
+          await setDoc(userRef, userData, { merge: true });
+          onOpenChange(false);
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        console.error("Signup Error", error);
+      }
+    };
 
     useEffect(() => {
         if (user) {
-             const userRef = doc(firestore, "users", user.uid);
-             const userData = {
-                id: user.uid,
-                name: signupFullName || user.displayName,
-                email: signupEmail || user.email,
-                board: signupBoard,
-                grade: signupGrade,
-                lastLoginDate: new Date().toISOString().split('T')[0],
-            };
-            setDocumentNonBlocking(userRef, userData, { merge: true });
             onOpenChange(false);
             router.push("/dashboard");
         }
-    }, [user, router, onOpenChange, firestore, signupFullName, signupEmail, signupBoard, signupGrade]);
+    }, [user, router, onOpenChange]);
 
     return (
         <Dialog onOpenChange={onOpenChange}>
@@ -271,3 +281,5 @@ export default function LandingPage() {
     </div>
   );
 }
+
+    
