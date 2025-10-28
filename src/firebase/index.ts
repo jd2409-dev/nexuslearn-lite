@@ -1,3 +1,4 @@
+
 'use client';
 
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
@@ -28,6 +29,11 @@ export function initializeFirebase(): FirebaseServices {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
   };
 
+  if (!firebaseConfig.apiKey) {
+    console.error("Firebase API key is missing. Make sure NEXT_PUBLIC_FIREBASE_API_KEY is set in your environment variables.");
+    return { firebaseApp: null, auth: null, firestore: null };
+  }
+
   const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
   const auth = getAuth(app);
   const firestore = getFirestore(app);
@@ -43,3 +49,4 @@ export * from './non-blocking-updates';
 export * from './non-blocking-login';
 export * from './errors';
 export * from './error-emitter';
+
