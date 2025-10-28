@@ -22,9 +22,9 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
 
   useEffect(() => {
     // This ensures that Firebase is initialized only on the client side.
-    const { firebaseApp, auth, firestore } = initializeFirebase();
-    if (firebaseApp && auth && firestore) {
-      setServices({ firebaseApp, auth, firestore });
+    const initializedServices = initializeFirebase();
+    if (initializedServices.firebaseApp && initializedServices.auth && initializedServices.firestore) {
+      setServices(initializedServices as FirebaseServices);
     }
   }, []);
 
