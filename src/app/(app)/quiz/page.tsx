@@ -122,15 +122,6 @@ export default function QuizPage() {
       return { ...q, isCorrect };
     });
 
-    const scorePercentage = (correctAnswers / quizQuestions.length) * 100;
-
-    if (userDocRef && scorePercentage > 50) {
-        await updateDoc(userDocRef, {
-            coins: increment(100)
-        });
-    }
-
-
     setQuizQuestions(submittedQuestions);
     setIsSubmitted(true);
 
@@ -302,5 +293,3 @@ export default function QuizPage() {
     </div>
   );
 }
-
-    

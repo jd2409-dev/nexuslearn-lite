@@ -54,7 +54,7 @@ const features = [
   },
   {
     title: "Gamified Learning",
-    description: "Earn XP and coins as you learn. Stay motivated with daily challenges and track your progress.",
+    description: "Stay motivated with daily challenges and track your progress.",
     icon: Star,
     image: PlaceHolderImages.find((img) => img.id === "challenges"),
   },
@@ -93,8 +93,6 @@ const AuthDialog = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
                 email: signupEmail || user.email,
                 board: signupBoard,
                 grade: signupGrade,
-                xp: 0,
-                coins: 0,
             };
             setDocumentNonBlocking(userRef, userData, { merge: true });
             onOpenChange(false);
@@ -282,4 +280,3 @@ export default function LandingPage() {
     </div>
   );
 }
-    

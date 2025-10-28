@@ -152,7 +152,6 @@ export default function Dashboard() {
       const today = format(new Date(), 'yyyy-MM-dd');
       if (userData.lastLoginDate !== today) {
         updateDoc(userDocRef, {
-          xp: increment(10),
           lastLoginDate: today,
         });
       }
@@ -164,34 +163,12 @@ export default function Dashboard() {
 
   const studyChallenges = studyGoals?.map(goal => ({
       title: goal.goalDescription,
-      xp: 50, // Assuming a fixed XP for now
       completed: goal.completed,
   })) || [];
 
 
   return (
-    <div className="flex-1 space-y-4">
-        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-2">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">XP Points</CardTitle>
-              <Star className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{userData?.xp || 0}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Coins</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{userData?.coins || 0}</div>
-            </CardContent>
-          </Card>
-        </div>
-
+    <div className="flex-1 space-y-8">
         <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
           <div className="xl:col-span-2">
             <h2 className="text-xl font-semibold mb-4">Quick Access</h2>
@@ -291,7 +268,7 @@ export default function Dashboard() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Challenge</TableHead>
-                                <TableHead className="text-right">XP</TableHead>
+                                <TableHead className="text-right">Status</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -301,7 +278,7 @@ export default function Dashboard() {
                                         <div className="font-medium">{challenge.title}</div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Badge variant={challenge.completed ? 'secondary' : 'outline'} className="text-accent-foreground border-accent">{challenge.xp} XP</Badge>
+                                       {challenge.completed ? <Badge variant="secondary">Done</Badge> : <Badge variant="outline">Pending</Badge>}
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -319,5 +296,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-    
