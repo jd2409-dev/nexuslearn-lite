@@ -28,9 +28,9 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
     }
   }, []);
 
+  // Do not render children until Firebase services are initialized.
   if (!services) {
-    // You can render a loading indicator here if needed
-    return null; 
+    return null; // Or a loading spinner
   }
 
   return (
