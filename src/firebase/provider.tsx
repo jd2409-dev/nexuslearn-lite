@@ -16,10 +16,10 @@ interface FirebaseProviderProps {
 export interface FirebaseContextState {
   firebaseApp: FirebaseApp;
   firestore: Firestore;
-  auth: Auth; 
+  auth: Auth;
   user: User | null;
-  isUserLoading: boolean; 
-  userError: Error | null; 
+  isUserLoading: boolean;
+  userError: Error | null;
 }
 
 export interface UserHookResult {
@@ -36,34 +36,32 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   firestore,
   auth,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isUserLoading, setIsUserLoading] = useState(true);
-  const [userError, setUserError] = useState<Error | null>(null);
+  const [userState, setUserState] = useState<UserHookResult>({
+    user: null,
+    isUserLoading: true,
+    userError: null,
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,
-      (firebaseUser) => { 
-        setUser(firebaseUser);
-        setIsUserLoading(false);
+      (user) => {
+        setUserState({ user, isUserLoading: false, userError: null });
       },
-      (error) => { 
+      (error) => {
         console.error("FirebaseProvider: onAuthStateChanged error:", error);
-        setUserError(error);
-        setIsUserLoading(false);
+        setUserState({ user: null, isUserLoading: false, userError: error });
       }
     );
     return () => unsubscribe();
   }, [auth]);
 
   const contextValue = useMemo((): FirebaseContextState => ({
-      firebaseApp,
-      firestore,
-      auth,
-      user,
-      isUserLoading,
-      userError,
-    }), [firebaseApp, firestore, auth, user, isUserLoading, userError]);
+    firebaseApp,
+    firestore,
+    auth,
+    ...userState,
+  }), [firebaseApp, firestore, auth, userState]);
 
   return (
     <FirebaseContext.Provider value={contextValue}>
@@ -98,22 +96,19 @@ export const useFirebaseApp = (): FirebaseApp => {
   return firebaseApp;
 };
 
-type MemoFirebase <T> = T & {__memo?: boolean};
+type MemoFirebase<T> = T & { __memo?: boolean };
 
 export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (MemoFirebase<T>) {
   const memoized = useMemo(factory, deps);
-  
-  if(typeof memoized !== 'object' || memoized === null) return memoized;
+
+  if (typeof memoized !== 'object' || memoized === null) return memoized;
   (memoized as MemoFirebase<T>).__memo = true;
-  
+
   return memoized;
 }
 
 export const useUser = (): UserHookResult => {
-  const context = useContext(FirebaseContext);
-  if (context === undefined) {
-    throw new Error('useUser must be used within a FirebaseProvider.');
-  }
+  const context = useFirebase();
   const { user, isUserLoading, userError } = context;
   return { user, isUserLoading, userError };
 };

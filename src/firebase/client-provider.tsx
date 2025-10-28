@@ -21,16 +21,18 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
   const [services, setServices] = useState<FirebaseServices | null>(null);
 
   useEffect(() => {
-    // This ensures that Firebase is initialized only on the client side.
+    // This ensures that Firebase is initialized only on the client side,
+    // after the component has mounted.
     const initializedServices = initializeFirebase();
     if (initializedServices.firebaseApp && initializedServices.auth && initializedServices.firestore) {
       setServices(initializedServices as FirebaseServices);
     }
   }, []);
 
-  // Do not render children until Firebase services are initialized.
+  // Do not render children until Firebase services are fully initialized.
+  // This prevents any component from trying to access Firebase before it's ready.
   if (!services) {
-    return null; // Or a loading spinner
+    return null; // Or you could return a global loading spinner here
   }
 
   return (
