@@ -19,13 +19,9 @@ export function Toaster() {
     setIsClient(true)
   }, [])
 
-  if (!isClient) {
-    return null
-  }
-
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+      {isClient && toasts.map(function ({ id, title, description, action, ...props }) {
         return (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
