@@ -26,37 +26,31 @@ const features = [
     title: "AI Tutor",
     description: "Get instant help with homework and complex topics. Our AI is available 24/7 to answer your questions.",
     icon: Bot,
-    image: PlaceHolderImages.find((img) => img.id === "ai-tutor"),
   },
   {
     title: "Generate a Quiz",
     description: "Create practice quizzes for any subject to test your knowledge and prepare for exams effectively.",
     icon: ClipboardCheck,
-    image: PlaceHolderImages.find((img) => img.id === "quiz"),
   },
   {
     title: "Learning Journal",
     description: "Organize your notes, thoughts, and reflections in a digital journal to consolidate your learning.",
     icon: BookOpen,
-    image: PlaceHolderImages.find((img) => img.id === "journal"),
   },
   {
     title: "Pomodoro Timer",
     description: "Use the Pomodoro technique with our built-in timer to focus your study sessions and improve efficiency.",
     icon: Timer,
-    image: PlaceHolderImages.find((img) => img.id === "pomodoro"),
   },
   {
     title: "Mistake Analysis",
     description: "Our AI analyzes your quiz results to identify weak areas and provide personalized suggestions for improvement.",
     icon: Lightbulb,
-    image: PlaceHolderImages.find((img) => img.id === "reflection"),
   },
   {
     title: "Gamified Learning",
     description: "Stay motivated with daily challenges and track your progress.",
     icon: Star,
-    image: PlaceHolderImages.find((img) => img.id === "challenges"),
   },
 ];
 
@@ -189,7 +183,7 @@ const AuthDialog = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
 
 export default function LandingPage() {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const router = useRouter();
   
   useEffect(() => {
@@ -197,6 +191,14 @@ export default function LandingPage() {
       router.push("/dashboard");
     }
   }, [user, router]);
+
+  if (isUserLoading || user) {
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <Loader2 className="h-16 w-16 animate-spin" />
+        </div>
+    )
+  }
 
 
   return (
@@ -245,16 +247,6 @@ export default function LandingPage() {
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {features.map((feature) => (
                 <Card key={feature.title} className="flex flex-col overflow-hidden transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
-                  {feature.image && (
-                     <Image
-                        alt={feature.title}
-                        className="aspect-video w-full object-cover"
-                        height="225"
-                        src={feature.image.imageUrl}
-                        width="400"
-                        data-ai-hint={feature.image.imageHint}
-                    />
-                  )}
                   <CardHeader>
                     <div className="flex items-center gap-3">
                         <feature.icon className="h-8 w-8 text-primary" />

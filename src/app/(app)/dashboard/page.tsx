@@ -9,8 +9,6 @@ import {
   ClipboardCheck,
   Timer,
   Lightbulb,
-  DollarSign,
-  Star,
   Upload,
   BookCopy,
   Loader2,
@@ -39,7 +37,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { getAiRecommendations } from "@/ai/flows/get-ai-recommendations";
 import { useEffect, useState, useCallback } from "react";
@@ -51,49 +48,42 @@ const quickAccessItems = [
     description: "Get instant help with homework and complex topics.",
     href: "/aichat",
     icon: Bot,
-    image: PlaceHolderImages.find((img) => img.id === "ai-tutor"),
   },
   {
     title: "Generate a Quiz",
     description: "Create practice quizzes for any subject.",
     href: "/quiz",
     icon: ClipboardCheck,
-    image: PlaceHolderImages.find((img) => img.id === "quiz"),
   },
   {
     title: "Essay Grader",
     description: "Get AI-powered feedback on your writing.",
     href: "/essay-grader",
     icon: FileText,
-    image: PlaceHolderImages.find((img) => img.id === "essay-grader"),
   },
   {
     title: "Study Planner",
     description: "Generate a personalized study plan with AI.",
     href: "/study-planner",
     icon: CalendarDays,
-    image: PlaceHolderImages.find((img) => img.id === "study-planner"),
   },
   {
     title: "Learning Journal",
     description: "Organize your notes and reflections.",
     href: "/journal",
     icon: BookOpen,
-    image: PlaceHolderImages.find((img) => img.id === "journal"),
   },
   {
     title: "Pomodoro Timer",
     description: "Focus your study sessions for maximum efficiency.",
     href: "/pomodoro",
     icon: Timer,
-    image: PlaceHolderImages.find((img) => img.id === "pomodoro"),
   },
   {
     title: "Mistake Analysis",
     description: "Review past quizzes and learn from your mistakes.",
     href: "/reflection",
     icon: Lightbulb,
-    image: PlaceHolderImages.find((img) => img.id === "reflection"),
   },
 ];
 
@@ -107,7 +97,7 @@ const iconMap: { [key: string]: React.ElementType } = {
 
 
 export default function Dashboard() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const [recommendations, setRecommendations] = useState<GetAiRecommendationsOutput['recommendations']>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
@@ -156,9 +146,11 @@ export default function Dashboard() {
         });
       }
       // Initial fetch for AI Recommendations
-      fetchRecommendations();
+      if (recommendations.length === 0 && !recsError) {
+        fetchRecommendations();
+      }
     }
-  }, [userData, userDocRef, fetchRecommendations]);
+  }, [userData, userDocRef, fetchRecommendations, recommendations.length, recsError]);
 
 
   const studyChallenges = studyGoals?.map(goal => ({
@@ -166,6 +158,13 @@ export default function Dashboard() {
       completed: goal.completed,
   })) || [];
 
+  if (isUserLoading || !userData) {
+    return (
+        <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+            <Loader2 className="h-16 w-16 animate-spin" />
+        </div>
+    )
+  }
 
   return (
     <div className="flex-1 space-y-8">
@@ -176,18 +175,6 @@ export default function Dashboard() {
               {quickAccessItems.map((item) => (
                 <Card key={item.title} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
                   <Link href={item.href}>
-                    <CardHeader className="p-0">
-                      {item.image && (
-                         <Image
-                            alt={item.title}
-                            className="aspect-video w-full object-cover"
-                            height="112"
-                            src={item.image.imageUrl}
-                            width="200"
-                            data-ai-hint={item.image.imageHint}
-                        />
-                      )}
-                    </CardHeader>
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2">
                         <item.icon className="h-5 w-5 text-primary" />
