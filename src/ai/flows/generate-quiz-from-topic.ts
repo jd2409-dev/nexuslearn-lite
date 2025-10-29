@@ -8,7 +8,7 @@
  * - GenerateQuizFromTopicOutput - The return type for the generateQuizFromTopic function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/server-genkit';
 import {z} from 'genkit';
 
 const GenerateQuizFromTopicInputSchema = z.object({

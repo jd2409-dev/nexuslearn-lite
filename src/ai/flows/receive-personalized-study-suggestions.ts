@@ -8,7 +8,7 @@
  * - PersonalizedStudySuggestionsOutput - The return type for the receivePersonalizedStudySuggestions function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/server-genkit';
 import {z} from 'genkit';
 
 const PersonalizedStudySuggestionsInputSchema = z.object({

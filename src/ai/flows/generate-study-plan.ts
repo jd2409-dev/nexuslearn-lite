@@ -7,7 +7,7 @@
  * - GenerateStudyPlanOutput - The return type for the generateStudyPlan function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/server-genkit';
 import {z} from 'genkit';
 
 const GenerateStudyPlanInputSchema = z.object({

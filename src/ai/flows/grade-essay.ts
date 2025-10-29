@@ -7,7 +7,7 @@
  * - GradeEssayOutput - The return type for the gradeEssay function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/server-genkit';
 import {z} from 'genkit';
 
 const GradeEssayInputSchema = z.object({

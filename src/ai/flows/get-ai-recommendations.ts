@@ -6,7 +6,7 @@
  * - getAiRecommendations - A function that generates personalized learning recommendations.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/server-genkit';
 import {
   GetAiRecommendationsInputSchema,
   GetAiRecommendationsOutputSchema,

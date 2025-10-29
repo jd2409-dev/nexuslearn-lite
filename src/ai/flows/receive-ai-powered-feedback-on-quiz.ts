@@ -9,7 +9,7 @@
  * - ReceiveAiPoweredFeedbackOnQuizOutput - The output type for the receiveAiPoweredFeedbackOnQuiz function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/server-genkit';
 import {z} from 'genkit';
 
 const ReceiveAiPoweredFeedbackOnQuizInputSchema = z.object({

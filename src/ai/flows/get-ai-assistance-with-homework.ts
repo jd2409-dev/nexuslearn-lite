@@ -7,7 +7,7 @@
  * - GetAiAssistanceWithHomeworkOutput - The return type for the getAiAssistanceWithHomework function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/server-genkit';
 import {z} from 'genkit';
 
 const GetAiAssistanceWithHomeworkInputSchema = z.object({
