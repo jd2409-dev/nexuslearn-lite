@@ -7,6 +7,7 @@ import { initializeFirebase } from '@/firebase';
 import type { FirebaseApp } from 'firebase/app';
 import type { Auth } from 'firebase/auth';
 import type { Firestore } from 'firebase/firestore';
+import { Loader2 } from 'lucide-react';
 
 interface FirebaseClientProviderProps {
   children: ReactNode;
@@ -33,7 +34,11 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
   // Do not render children until Firebase services are fully initialized.
   // This prevents any component from trying to access Firebase before it's ready.
   if (!services) {
-    return null; // Or you could return a global loading spinner here
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <Loader2 className="h-16 w-16 animate-spin" />
+        </div>
+    );
   }
 
   return (
