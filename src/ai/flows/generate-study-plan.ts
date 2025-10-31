@@ -1,4 +1,4 @@
-'use server';
+
 /**
  * @fileOverview Generates a personalized study plan for a student.
  *
@@ -7,7 +7,7 @@
  * - GenerateStudyPlanOutput - The return type for the generateStudyPlan function.
  */
 
-import {ai} from '@/ai/server-genkit';
+import {ai} from '@/ai/client-genkit';
 import {z} from 'genkit';
 
 const GenerateStudyPlanInputSchema = z.object({
@@ -56,7 +56,4 @@ const generateStudyPlanFlow = ai.defineFlow(
     outputSchema: GenerateStudyPlanOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
-  }
-);
+    const

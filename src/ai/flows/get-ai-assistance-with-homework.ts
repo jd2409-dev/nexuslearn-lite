@@ -1,4 +1,3 @@
-'use server';
 /**
  * @fileOverview An AI agent to provide homework assistance to students.
  *
@@ -7,7 +6,7 @@
  * - GetAiAssistanceWithHomeworkOutput - The return type for the getAiAssistanceWithHomework function.
  */
 
-import {ai} from '@/ai/server-genkit';
+import {ai} from '@/ai/client-genkit';
 import {z} from 'genkit';
 
 const GetAiAssistanceWithHomeworkInputSchema = z.object({

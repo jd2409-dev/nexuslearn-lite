@@ -1,12 +1,10 @@
-'use server';
-
 /**
  * @fileOverview Provides personalized AI recommendations for learning.
  *
  * - getAiRecommendations - A function that generates personalized learning recommendations.
  */
 
-import {ai} from '@/ai/server-genkit';
+import {ai} from '@/ai/client-genkit';
 import {
   GetAiRecommendationsInputSchema,
   GetAiRecommendationsOutputSchema,

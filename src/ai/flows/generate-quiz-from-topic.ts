@@ -1,4 +1,4 @@
-'use server';
+
 
 /**
  * @fileOverview Generates a quiz on a specific topic.
@@ -8,7 +8,7 @@
  * - GenerateQuizFromTopicOutput - The return type for the generateQuizFromTopic function.
  */
 
-import {ai} from '@/ai/server-genkit';
+import {ai} from '@/ai/client-genkit';
 import {z} from 'genkit';
 
 const GenerateQuizFromTopicInputSchema = z.object({
@@ -48,4 +48,3 @@ const generateQuizFromTopicFlow = ai.defineFlow(
     const {output} = await prompt(input);
     return output!;
   }
-);

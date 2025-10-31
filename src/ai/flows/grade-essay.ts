@@ -1,4 +1,3 @@
-'use server';
 /**
  * @fileOverview Grades an essay based on clarity, neatness, argument, and checks for AI generation.
  *
@@ -7,7 +6,7 @@
  * - GradeEssayOutput - The return type for the gradeEssay function.
  */
 
-import {ai} from '@/ai/server-genkit';
+import {ai} from '@/ai/client-genkit';
 import {z} from 'genkit';
 
 const GradeEssayInputSchema = z.object({

@@ -1,4 +1,4 @@
-'use server';
+
 /**
  * @fileOverview This flow provides AI-powered feedback on quiz answers.
  *
@@ -9,7 +9,7 @@
  * - ReceiveAiPoweredFeedbackOnQuizOutput - The output type for the receiveAiPoweredFeedbackOnQuiz function.
  */
 
-import {ai} from '@/ai/server-genkit';
+import {ai} from '@/ai/client-genkit';
 import {z} from 'genkit';
 
 const ReceiveAiPoweredFeedbackOnQuizInputSchema = z.object({
@@ -37,24 +37,4 @@ const feedbackPrompt = ai.definePrompt({
   prompt: `You are an AI tutor providing feedback on a quiz.
 
   Provide clear, concise, and helpful explanations for each answer, focusing on areas where the student can improve.
-  Address each question individually, and provide reasoning as to why the given correct answer is accurate.
-
-  Quiz Questions: {{quizQuestions}}
-  User Answers: {{userAnswers}}
-  Correct Answers: {{correctAnswers}}
-
-  \nGenerate feedback for each question and answer:
-  `,
-});
-
-const receiveAiPoweredFeedbackOnQuizFlow = ai.defineFlow(
-  {
-    name: 'receiveAiPoweredFeedbackOnQuizFlow',
-    inputSchema: ReceiveAiPoweredFeedbackOnQuizInputSchema,
-    outputSchema: ReceiveAiPoweredFeedbackOnQuizOutputSchema,
-  },
-  async input => {
-    const {output} = await feedbackPrompt(input);
-    return output!;
-  }
-);
+  Address each question individually, and provide reasoning as to why the given correct answer is a
