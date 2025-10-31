@@ -1,5 +1,3 @@
-
-
 /**
  * @fileOverview Generates a quiz on a specific topic.
  *
@@ -35,7 +33,7 @@ const prompt = ai.definePrompt({
 
     Generate a quiz on the topic of {{{topic}}} with {{{numQuestions}}} questions. The question type is {{{questionType}}}.
     Provide the questions and the answers in markdown format.
-    `, 
+    `,
 });
 
 const generateQuizFromTopicFlow = ai.defineFlow(

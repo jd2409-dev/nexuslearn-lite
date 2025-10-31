@@ -1,4 +1,6 @@
 'use server';
+// This file is intended for local development with the Genkit developer UI.
+// It is not used in the production static build.
 import { config } from 'dotenv';
 config();
 

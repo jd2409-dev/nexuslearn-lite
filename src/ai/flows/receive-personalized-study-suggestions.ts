@@ -1,5 +1,3 @@
-
-
 /**
  * @fileOverview Provides personalized study suggestions based on quiz results.
  *
