@@ -1,0 +1,13 @@
+diff --git a/node_modules/next/dist/build/webpack-config.js b/node_modules/next/dist/build/webpack-config.js
+index b5b5976b7e0524b0e897e68e4c7d678d5970c6a5..e5d16790a0279659b81d2f70b79717724391a3dc 100644
+--- a/node_modules/next/dist/build/webpack-config.js
++++ b/node_modules/next/dist/build/webpack-config.js
+@@ -1030,6 +1030,7 @@
+             // ESM externals can be excluded from the bundle using `resolve.externals`.
+             // And they will be loaded dynamically at runtime.
+             // But we can't use that for CommonJS externals.
++            "async_hooks": false,
+             "assert": false,
+             "buffer": false,
+             "child_process": false,
+
