@@ -1,7 +1,6 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   output: 'export',
   typescript: {
     ignoreBuildErrors: true,
@@ -40,6 +39,7 @@ const nextConfig: NextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
+      // This is the correct way to exclude a server-side module from the client bundle.
       config.resolve.fallback = {
         ...config.resolve.fallback,
         async_hooks: false,
