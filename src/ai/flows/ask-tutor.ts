@@ -4,7 +4,7 @@
  * @fileOverview The main flow for the AI Tutor.
  */
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit/zod';
+import {z} from 'zod';
 
 export const askTutor = ai.defineFlow(
   {
