@@ -14,7 +14,6 @@ import {
   Loader2,
   FileText,
   CalendarDays,
-  RefreshCw,
 } from "lucide-react";
 import Image from "next/image";
 import { doc, collection, updateDoc, increment } from "firebase/firestore";
@@ -38,9 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
-import { getAiRecommendations } from "@/ai/flows/get-ai-recommendations";
-import { useEffect, useState, useCallback } from "react";
-import type { GetAiRecommendationsOutput } from "@/ai/schemas/recommendations";
+import { useEffect } from "react";
 
 const quickAccessItems = [
   {
@@ -87,21 +84,9 @@ const quickAccessItems = [
   },
 ];
 
-
-const iconMap: { [key: string]: React.ElementType } = {
-    review: BookCopy,
-    practice: ClipboardCheck,
-    focus: Timer,
-    default: Lightbulb
-};
-
-
 export default function Dashboard() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
-  const [recommendations, setRecommendations] = useState<GetAiRecommendationsOutput['recommendations']>([]);
-  const [loadingRecs, setLoadingRecs] = useState(true);
-  const [recsError, setRecsError] = useState<string | null>(null);
 
   const userDocRef = useMemoFirebase(() =>
     user ? doc(firestore, `users/${user.uid}`) : null
@@ -113,28 +98,6 @@ export default function Dashboard() {
     , [firestore, user]);
   const { data: studyGoals } = useCollection(studyGoalsCollectionRef);
 
-  const fetchRecommendations = useCallback(() => {
-    if (userData) {
-        setLoadingRecs(true);
-        setRecsError(null);
-        const input = {
-            studentGrade: userData.grade,
-            studentBoard: userData.board,
-            recentPerformance: "mixed",
-        };
-        getAiRecommendations(input)
-            .then(response => {
-                setRecommendations(response.recommendations);
-            })
-            .catch(err => {
-                console.error("Error fetching AI recommendations", err);
-                setRecsError("Could not load recommendations. The AI service may be temporarily unavailable.");
-            })
-            .finally(() => {
-                setLoadingRecs(false);
-            });
-    }
-  }, [userData]);
 
    useEffect(() => {
     if (userData && userDocRef) {
@@ -145,12 +108,8 @@ export default function Dashboard() {
           lastLoginDate: today,
         });
       }
-      // Initial fetch for AI Recommendations
-      if (recommendations.length === 0 && !recsError) {
-        fetchRecommendations();
-      }
     }
-  }, [userData, userDocRef, fetchRecommendations, recommendations.length, recsError]);
+  }, [userData, userDocRef]);
 
 
   const studyChallenges = studyGoals?.map(goal => ({
@@ -210,40 +169,9 @@ export default function Dashboard() {
                 </Button>
               </CardHeader>
                <CardContent className="grid gap-4">
-                {loadingRecs ? (
-                    <div className="flex items-center justify-center p-8">
-                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                    </div>
-                ) : recsError ? (
-                  <div className="flex flex-col items-center justify-center p-8 text-center">
-                    <p className="text-sm text-destructive mb-4">{recsError}</p>
-                    <Button variant="outline" size="sm" onClick={fetchRecommendations}>
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Try Again
-                    </Button>
+                 <div className="flex flex-col items-center justify-center p-8 text-center">
+                    <p className="text-sm text-muted-foreground">AI recommendations are currently unavailable.</p>
                   </div>
-                ) : recommendations.length > 0 ? (
-                  recommendations.map((rec, index) => {
-                    const Icon = iconMap[rec.type] || iconMap.default;
-                    return (
-                        <div key={index} className=" flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
-                        <div className="p-2 bg-primary/10 rounded-md">
-                            <Icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="grid gap-1">
-                            <p className="text-sm font-medium leading-none">
-                            {rec.title}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                            {rec.reason}
-                            </p>
-                        </div>
-                        </div>
-                    );
-                  })
-                ) : (
-                    <p className="text-sm text-muted-foreground p-4 text-center">No recommendations available right now.</p>
-                )}
                 </CardContent>
             </Card>
             <Card className="mt-4">
