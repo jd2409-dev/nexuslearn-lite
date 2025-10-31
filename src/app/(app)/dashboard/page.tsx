@@ -10,13 +10,11 @@ import {
   Timer,
   Lightbulb,
   Upload,
-  BookCopy,
   Loader2,
   FileText,
   CalendarDays,
 } from "lucide-react";
-import Image from "next/image";
-import { doc, collection, updateDoc, increment } from "firebase/firestore";
+import { doc, collection, updateDoc } from "firebase/firestore";
 import { format } from 'date-fns';
 
 import { Badge } from "@/components/ui/badge";
@@ -40,48 +38,48 @@ import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@
 import { useEffect } from "react";
 
 const quickAccessItems = [
-  {
-    title: "AI Tutor",
-    description: "Get instant help with homework and complex topics.",
-    href: "/aichat",
-    icon: Bot,
-  },
-  {
-    title: "Generate a Quiz",
-    description: "Create practice quizzes for any subject.",
-    href: "/quiz",
-    icon: ClipboardCheck,
-  },
-  {
-    title: "Essay Grader",
-    description: "Get AI-powered feedback on your writing.",
-    href: "/essay-grader",
-    icon: FileText,
-  },
-  {
-    title: "Study Planner",
-    description: "Generate a personalized study plan with AI.",
-    href: "/study-planner",
-    icon: CalendarDays,
-  },
-  {
-    title: "Learning Journal",
-    description: "Organize your notes and reflections.",
-    href: "/journal",
-    icon: BookOpen,
-  },
-  {
-    title: "Pomodoro Timer",
-    description: "Focus your study sessions for maximum efficiency.",
-    href: "/pomodoro",
-    icon: Timer,
-  },
-  {
-    title: "Mistake Analysis",
-    description: "Review past quizzes and learn from your mistakes.",
-    href: "/reflection",
-    icon: Lightbulb,
-  },
+    {
+        title: "AI Tutor",
+        description: "Get instant help with homework and complex topics.",
+        href: "/aichat",
+        icon: Bot,
+    },
+    {
+        title: "Generate a Quiz",
+        description: "Create practice quizzes for any subject.",
+        href: "/quiz",
+        icon: ClipboardCheck,
+    },
+    {
+        title: "Essay Grader",
+        description: "Get AI-powered feedback on your writing.",
+        href: "/essay-grader",
+        icon: FileText,
+    },
+    {
+        title: "Study Planner",
+        description: "Generate a personalized study plan with AI.",
+        href: "/study-planner",
+        icon: CalendarDays,
+    },
+    {
+        title: "Learning Journal",
+        description: "Organize your notes and reflections.",
+        href: "/journal",
+        icon: BookOpen,
+    },
+    {
+        title: "Pomodoro Timer",
+        description: "Focus your study sessions for maximum efficiency.",
+        href: "/pomodoro",
+        icon: Timer,
+    },
+    {
+        title: "Mistake Analysis",
+        description: "Review past quizzes and learn from your mistakes.",
+        href: "/reflection",
+        icon: Lightbulb,
+    },
 ];
 
 export default function Dashboard() {
