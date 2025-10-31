@@ -56,4 +56,7 @@ const generateStudyPlanFlow = ai.defineFlow(
     outputSchema: GenerateStudyPlanOutputSchema,
   },
   async input => {
-    const
+    const {output} = await prompt(input);
+    return output!;
+  }
+);

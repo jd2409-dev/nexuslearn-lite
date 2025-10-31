@@ -38,3 +38,17 @@ const feedbackPrompt = ai.definePrompt({
 
   Provide clear, concise, and helpful explanations for each answer, focusing on areas where the student can improve.
   Address each question individually, and provide reasoning as to why the given correct answer is a
+`,
+});
+
+const receiveAiPoweredFeedbackOnQuizFlow = ai.defineFlow(
+  {
+    name: 'receiveAiPoweredFeedbackOnQuizFlow',
+    inputSchema: ReceiveAiPoweredFeedbackOnQuizInputSchema,
+    outputSchema: ReceiveAiPoweredFeedbackOnQuizOutputSchema,
+  },
+  async input => {
+    const {output} = await feedbackPrompt(input);
+    return output!;
+  }
+);

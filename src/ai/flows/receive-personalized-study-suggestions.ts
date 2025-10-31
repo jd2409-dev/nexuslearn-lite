@@ -1,4 +1,4 @@
-'use server';
+
 
 /**
  * @fileOverview Provides personalized study suggestions based on quiz results.
@@ -8,7 +8,7 @@
  * - PersonalizedStudySuggestionsOutput - The return type for the receivePersonalizedStudySuggestions function.
  */
 
-import {ai} from '@/ai/server-genkit';
+import {ai} from '@/ai/client-genkit';
 import {z} from 'genkit';
 
 const PersonalizedStudySuggestionsInputSchema = z.object({
