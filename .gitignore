@@ -11,10 +11,7 @@
 # next.js
 /.next/
 /out/
-/docs/
-
-# production
-/build
+/build/
 
 # misc
 .DS_Store
@@ -27,7 +24,10 @@ yarn-error.log*
 
 # local env files
 .env
-.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # vercel
 .vercel
@@ -36,8 +36,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Netlify
-.netlify
-
-# Firebase
-.firebaserc
+# build output
+.nojekyll
+_next
+404.html
+favicon.ico
+index.html
+index.txt
