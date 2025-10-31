@@ -8,7 +8,7 @@ export default function AiChatPage() {
         <Bot className="h-16 w-16 text-muted-foreground" />
         <h2 className="mt-6 text-xl font-semibold">AI Tutor Disabled</h2>
         <p className="mt-2 text-center text-muted-foreground">
-          This feature is temporarily unavailable due to persistent technical issues.
+          This feature is temporarily unavailable due to technical issues.
         </p>
     </div>
   );
