@@ -3,9 +3,9 @@
  * @fileoverview An AI flow for answering student questions.
  */
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit/zod';
+import {z} from 'zod';
 
-export const askTutor = ai.defineFlow(
+export const askTutorFlow = ai.defineFlow(
   {
     name: 'askTutor',
     inputSchema: z.string(),
