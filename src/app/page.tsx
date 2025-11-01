@@ -221,8 +221,8 @@ export default function LandingPage() {
             </nav>
           </div>
         </header>
-        <main className="flex-1">
-          <section className="py-20 text-center">
+        <main className="flex flex-1 flex-col">
+          <section className="flex flex-1 items-center justify-center py-20 text-center">
             <div className="container">
               <h1 className="text-4xl font-extrabold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
                 Supercharge Your Studies with AI
@@ -238,7 +238,7 @@ export default function LandingPage() {
             </div>
           </section>
 
-          <section id="features" className="py-20 bg-card">
+          <section id="features" className="flex flex-1 items-center justify-center py-20 bg-card">
             <div className="container">
               <div className="mb-12 text-center">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">All-in-One Learning Platform</h2>
