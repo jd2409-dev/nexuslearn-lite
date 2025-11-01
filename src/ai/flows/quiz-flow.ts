@@ -6,31 +6,15 @@
  * question type to generate a structured quiz.
  *
  * - generateQuiz - The main function to call the quiz generation flow.
- * - QuizInput - The input type for the flow.
- * - QuizQuestion - The schema for a single question in the output.
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
-
-// Input schema for the quiz generation flow
-export const QuizInputSchema = z.object({
-  topic: z.string().describe('The topic for the quiz.'),
-  numQuestions: z.number().int().min(1).max(10).describe('The number of questions to generate.'),
-  questionType: z.enum(['mcq', 'true-false', 'short-answer']).describe('The type of questions to generate.'),
-});
-export type QuizInput = z.infer<typeof QuizInputSchema>;
-
-// Schema for a single quiz question in the output
-export const QuizQuestionSchema = z.object({
-  question: z.string().describe('The text of the question.'),
-  options: z.array(z.string()).optional().describe('A list of possible answers for MCQ or True/False.'),
-  correctAnswer: z.string().describe('The correct answer to the question.'),
-});
-export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
-
-// Output schema for the quiz generation flow
-const QuizOutputSchema = z.array(QuizQuestionSchema);
+import {
+  QuizInputSchema,
+  QuizQuestion,
+  QuizOutputSchema,
+  type QuizInput,
+} from '@/ai/schemas/quiz-schemas';
 
 /**
  * Generates a quiz based on the provided input.
