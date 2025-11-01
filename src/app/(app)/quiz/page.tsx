@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -96,7 +97,10 @@ export default function QuizPage() {
     if (!quiz) return;
     let correctAnswers = 0;
     quiz.forEach((q, index) => {
-      if (userAnswers[index] === q.correctAnswer) {
+      // Case-insensitive comparison for short answers
+      const userAnswer = userAnswers[index]?.trim().toLowerCase();
+      const correctAnswer = q.correctAnswer?.trim().toLowerCase();
+      if (userAnswer === correctAnswer) {
         correctAnswers++;
       }
     });
@@ -138,20 +142,20 @@ export default function QuizPage() {
         <CardContent className="space-y-6">
           <div className="text-center">
              <Progress value={(score / quiz.length) * 100} className="w-full" />
-             <p className="text-lg font-bold mt-2">{(score / quiz.length) * 100}%</p>
+             <p className="text-lg font-bold mt-2">{Math.round((score / quiz.length) * 100)}%</p>
           </div>
           <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-4">
             {quiz.map((q, index) => (
-              <div key={index} className={`p-4 rounded-lg ${userAnswers[index] === q.correctAnswer ? 'bg-green-100 dark:bg-green-900/20 border border-green-400' : 'bg-red-100 dark:bg-red-900/20 border border-red-400'}`}>
+              <div key={index} className={`p-4 rounded-lg ${userAnswers[index]?.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase() ? 'bg-green-100 dark:bg-green-900/20 border border-green-400' : 'bg-red-100 dark:bg-red-900/20 border border-red-400'}`}>
                 <p className="font-semibold">{index + 1}. {q.question}</p>
-                <p className={`mt-2 text-sm ${userAnswers[index] === q.correctAnswer ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'}`}>
+                <p className={`mt-2 text-sm ${userAnswers[index]?.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase() ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'}`}>
                   Your answer: {userAnswers[index] || "Not answered"}
-                  {userAnswers[index] === q.correctAnswer 
+                  {userAnswers[index]?.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase() 
                     ? <CheckCircle className="inline ml-2 h-4 w-4"/> 
                     : <XCircle className="inline ml-2 h-4 w-4"/>
                   }
                 </p>
-                {userAnswers[index] !== q.correctAnswer && (
+                {userAnswers[index]?.trim().toLowerCase() !== q.correctAnswer.trim().toLowerCase() && (
                   <p className="mt-1 text-sm text-green-800 dark:text-green-300">Correct answer: {q.correctAnswer}</p>
                 )}
               </div>
@@ -170,47 +174,57 @@ export default function QuizPage() {
   if (quiz) {
     const currentQuestion = quiz[currentQuestionIndex];
     return (
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <Progress value={((currentQuestionIndex + 1) / quiz.length) * 100} className="mb-4" />
-          <CardTitle>
-            Question {currentQuestionIndex + 1} of {quiz.length}
-          </CardTitle>
-          <CardDescription className="text-lg pt-2">
-            {currentQuestion.question}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup
-            onValueChange={handleAnswerSelect}
-            value={userAnswers[currentQuestionIndex]}
-            className="space-y-2"
-          >
-            {currentQuestion.options?.map((option, i) => (
-              <FormItem
-                key={i}
-                className="flex items-center space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent"
-              >
-                <FormControl>
-                  <RadioGroupItem value={option} />
-                </FormControl>
-                <FormLabel className="font-normal flex-1 cursor-pointer">
-                  {option}
-                </FormLabel>
-              </FormItem>
-            ))}
-          </RadioGroup>
-        </CardContent>
-        <CardFooter>
-          <Button
-            onClick={handleNextQuestion}
-            disabled={!userAnswers[currentQuestionIndex]}
-            className="w-full"
-          >
-            {currentQuestionIndex < quiz.length - 1 ? 'Next Question' : 'Finish Quiz'}
-          </Button>
-        </CardFooter>
-      </Card>
+       <Form {...form}>
+        <Card className="w-full max-w-2xl mx-auto">
+          <CardHeader>
+            <Progress value={((currentQuestionIndex + 1) / quiz.length) * 100} className="mb-4" />
+            <CardTitle>
+              Question {currentQuestionIndex + 1} of {quiz.length}
+            </CardTitle>
+            <CardDescription className="text-lg pt-2">
+              {currentQuestion.question}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {form.getValues('questionType') === 'short-answer' ? (
+                <Input
+                    placeholder="Type your answer here..."
+                    value={userAnswers[currentQuestionIndex] || ''}
+                    onChange={(e) => handleAnswerSelect(e.target.value)}
+                />
+            ) : (
+                <RadioGroup
+                    onValueChange={handleAnswerSelect}
+                    value={userAnswers[currentQuestionIndex]}
+                    className="space-y-2"
+                >
+                    {currentQuestion.options?.map((option, i) => (
+                    <FormItem
+                        key={i}
+                        className="flex items-center space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent"
+                    >
+                        <FormControl>
+                        <RadioGroupItem value={option} />
+                        </FormControl>
+                        <FormLabel className="font-normal flex-1 cursor-pointer">
+                        {option}
+                        </FormLabel>
+                    </FormItem>
+                    ))}
+                </RadioGroup>
+            )}
+          </CardContent>
+          <CardFooter>
+            <Button
+              onClick={handleNextQuestion}
+              disabled={!userAnswers[currentQuestionIndex]}
+              className="w-full"
+            >
+              {currentQuestionIndex < quiz.length - 1 ? 'Next Question' : 'Finish Quiz'}
+            </Button>
+          </CardFooter>
+        </Card>
+      </Form>
     );
   }
 
@@ -290,3 +304,4 @@ export default function QuizPage() {
     </Card>
   );
 }
+
