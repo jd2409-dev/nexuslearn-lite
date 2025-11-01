@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -10,6 +11,7 @@ import { useUser } from "@/firebase";
 type Message = {
   from: "user" | "bot";
   text: string;
+  isError?: boolean;
 };
 
 export default function AiChatPage() {
@@ -44,17 +46,20 @@ export default function AiChatPage() {
         body: JSON.stringify({ prompt: input.trim() }),
       });
 
-      if (!response.ok) {
-        throw new Error("Something went wrong");
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        // Use the detailed error message from the backend
+        throw new Error(data.error || "Something went wrong");
+      }
+      
       const botMessage: Message = { from: "bot", text: data.text };
       setMessages((prev) => [...prev, botMessage]);
 
     } catch (error) {
       console.error("Error fetching AI response:", error);
-      setMessages((prev) => [...prev, { from: "bot", text: "Sorry, something went wrong." }]);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+      setMessages((prev) => [...prev, { from: "bot", text: errorMessage, isError: true }]);
     } finally {
       setLoading(false);
     }
@@ -96,7 +101,7 @@ export default function AiChatPage() {
             <div
               className={`max-w-[70%] rounded-lg p-3 ${
                 msg.from === "bot"
-                  ? "bg-secondary text-secondary-foreground"
+                  ? msg.isError ? "bg-destructive text-destructive-foreground" : "bg-secondary text-secondary-foreground"
                   : "bg-primary text-primary-foreground"
               }`}
             >
