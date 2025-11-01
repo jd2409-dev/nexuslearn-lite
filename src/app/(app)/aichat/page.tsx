@@ -44,27 +44,14 @@ export default function AiChatPage() {
         body: JSON.stringify({ prompt: input.trim() }),
       });
 
-      if (!response.body) {
-        throw new Error("No response body");
+      if (!response.ok) {
+        throw new Error("Something went wrong");
       }
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let botMessage = "";
+      const data = await response.json();
+      const botMessage: Message = { from: "bot", text: data.text };
+      setMessages((prev) => [...prev, botMessage]);
 
-      setMessages((prev) => [...prev, { from: "bot", text: "" }]);
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        botMessage += chunk;
-        setMessages((prev) => {
-          const newMessages = [...prev];
-          newMessages[newMessages.length - 1].text = botMessage;
-          return newMessages;
-        });
-      }
     } catch (error) {
       console.error("Error fetching AI response:", error);
       setMessages((prev) => [...prev, { from: "bot", text: "Sorry, something went wrong." }]);
@@ -123,7 +110,7 @@ export default function AiChatPage() {
             )}
           </div>
         ))}
-        {loading && messages[messages.length -1].from === 'user' && (
+        {loading && (
           <div className="flex items-start gap-4 justify-start">
              <Avatar>
                 <AvatarFallback>

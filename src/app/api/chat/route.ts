@@ -1,7 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export const runtime = 'edge';
-
 export async function POST(req: Request) {
   const { prompt } = await req.json();
 
@@ -14,21 +12,13 @@ export async function POST(req: Request) {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   try {
-    const result = await model.generateContentStream(prompt);
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        for await (const chunk of result.stream) {
-          const chunkText = chunk.text();
-          controller.enqueue(new TextEncoder().encode(chunkText));
-        }
-        controller.close();
-      },
-    });
-
-    return new Response(stream, {
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+    
+    return new Response(JSON.stringify({ text }), {
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
+        'Content-Type': 'application/json',
       },
     });
 
