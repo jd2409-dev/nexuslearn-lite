@@ -15,6 +15,7 @@ import {
   QuizOutputSchema,
   type QuizInput,
 } from '@/ai/schemas/quiz-schemas';
+import { googleAI } from '@genkit-ai/google-genai';
 
 /**
  * Generates a quiz based on the provided input.
@@ -28,6 +29,7 @@ export async function generateQuiz(input: QuizInput): Promise<QuizQuestion[]> {
 // Define the Genkit prompt for the AI model
 const quizPrompt = ai.definePrompt({
   name: 'quizPrompt',
+  model: googleAI('gemini-2.5-flash'),
   input: { schema: QuizInputSchema },
   output: { schema: QuizOutputSchema },
   prompt: `
