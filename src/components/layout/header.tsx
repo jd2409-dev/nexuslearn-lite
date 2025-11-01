@@ -1,7 +1,8 @@
+
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Home,
   PanelLeft,
@@ -13,8 +14,11 @@ import {
   Search,
   FileText,
   CalendarDays,
+  LogOut
 } from "lucide-react"
+import { signOut } from "firebase/auth";
 
+import { useAuth } from "@/firebase";
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -28,6 +32,7 @@ import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { AppLogo } from "../icons"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { useUser } from "@/firebase";
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
@@ -54,6 +59,18 @@ const pageTitles: { [key: string]: string } = {
 export default function Header() {
   const pathname = usePathname();
   const title = pageTitles[pathname] || "NexusLearn Lite";
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
   
   const getBreadcrumbs = () => {
     const paths = pathname.split('/').filter(p => p);
@@ -119,8 +136,8 @@ export default function Header() {
             className="overflow-hidden rounded-full"
           >
             <Avatar>
-              <AvatarImage src="https://picsum.photos/seed/avatar/32/32" alt="Avatar" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src={user?.photoURL || "https://picsum.photos/seed/avatar/32/32"} alt="Avatar" />
+              <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -130,8 +147,9 @@ export default function Header() {
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <Link href="/">Logout</Link>
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Logout</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
