@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const { prompt } = await req.json();
@@ -6,9 +7,8 @@ export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey === "YOUR_API_KEY_HERE") {
     console.error("Gemini API key not found or not configured.");
-    return new Response(JSON.stringify({ error: { message: "API key not found or not configured. Please set GEMINI_API_KEY in your .env file." } }), {
+    return NextResponse.json({ error: { message: "API key not found or not configured. Please set GEMINI_API_KEY in your .env file." } }, {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -20,17 +20,12 @@ export async function POST(req: Request) {
     const response = result.response;
     const text = response.text();
     
-    return new Response(JSON.stringify({ text }), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    return NextResponse.json({ text });
 
   } catch (error) {
     console.error("Failed to generate content:", error);
-    return new Response(JSON.stringify({ error: { message: "Failed to generate content from the AI model." } }), { 
+    return NextResponse.json({ error: { message: "Failed to generate content from the AI model." } }, { 
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
     });
   }
 }
