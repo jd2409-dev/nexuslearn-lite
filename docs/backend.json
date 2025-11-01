@@ -265,6 +265,33 @@
         "analysis",
         "suggestions"
       ]
+    },
+    "QuizAttempt": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "QuizAttempt",
+      "description": "Represents a user's attempt at a quiz, including their answers and score.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "topic": { "type": "string" },
+        "score": { "type": "number" },
+        "totalQuestions": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": { "type": "string" },
+              "userAnswer": { "type": "string" },
+              "correctAnswer": { "type": "string" }
+            },
+            "required": ["question", "userAnswer", "correctAnswer"]
+          }
+        }
+      },
+      "required": ["userId", "topic", "score", "totalQuestions", "createdAt", "questions"]
     }
   },
   "auth": {
@@ -355,6 +382,14 @@
           ]
         }
       },
+       {
+        "path": "/users/{userId}/quizAttempts/{quizAttemptId}",
+        "definition": {
+          "entityName": "QuizAttempt",
+          "schema": { "$ref": "#/backend/entities/QuizAttempt" },
+          "description": "Stores a user's quiz attempts. Path-based ownership ensures only the authenticated user can access their quiz history."
+        }
+      },
       {
         "path": "/users/{userId}/journalEntries/{journalEntryId}",
         "definition": {
@@ -416,6 +451,8 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis`, and `QuizAttempt` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
   }
 }
+
+    

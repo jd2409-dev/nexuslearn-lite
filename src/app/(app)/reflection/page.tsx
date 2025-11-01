@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { analyzeMistakes, MistakeAnalysis } from '@/ai/flows/mistake-analyzer-flow';
 
 import { Loader2, Lightbulb, AlertTriangle, BrainCircuit } from 'lucide-react';
@@ -10,50 +11,53 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-// Mock quiz data structure for demonstration
-// In a real app, this would come from Firestore `useCollection`
+type QuizQuestionAttempt = {
+    question: string;
+    userAnswer: string;
+    correctAnswer: string;
+};
+
 type QuizAttempt = {
   id: string;
   topic: string;
   score: number;
   totalQuestions: number;
-  questions: Array<{
-    question: string;
-    userAnswer: string;
-    correctAnswer: string;
-  }>;
+  questions: QuizQuestionAttempt[];
 };
 
 export default function ReflectionPage() {
   const { user } = useUser();
   const firestore = useFirestore();
   const [analysis, setAnalysis] = useState<MistakeAnalysis | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // This is a placeholder for fetching real quiz data.
-  // We will use mock data for now.
-  const [quizHistory, setQuizHistory] = useState<QuizAttempt[]>([
-    {
-        id: "1",
-        topic: "Cellular Biology",
-        score: 2,
-        totalQuestions: 4,
-        questions: [
-            { question: "What is the powerhouse of the cell?", userAnswer: "Nucleus", correctAnswer: "Mitochondria" },
-            { question: "What does DNA stand for?", userAnswer: "Deoxyribonucleic Acid", correctAnswer: "Deoxyribonucleic Acid" },
-            { question: "What is the function of the cell membrane?", userAnswer: "To provide structure", correctAnswer: "To control what enters and leaves the cell" },
-            { question: "What is photosynthesis?", userAnswer: "The process of creating energy from sunlight", correctAnswer: "The process of creating energy from sunlight" }
-        ]
-    }
-  ]);
+  const quizAttemptsRef = useMemoFirebase(
+    () => (user ? collection(firestore, `users/${user.uid}/quizAttempts`) : null),
+    [firestore, user]
+  );
+  
+  const quizAttemptsQuery = useMemoFirebase(
+      () => (quizAttemptsRef ? query(quizAttemptsRef, orderBy("createdAt", "desc"), limit(10)) : null),
+      [quizAttemptsRef]
+  );
+
+  const { data: quizHistory, isLoading: isLoadingHistory } = useCollection<Omit<QuizAttempt, 'id'>>(quizAttemptsQuery);
 
   useEffect(() => {
+    if (isLoadingHistory) {
+        setIsAnalyzing(true);
+        return;
+    }
+    
     const analyze = async () => {
-      if (quizHistory.length === 0) {
+      if (!quizHistory || quizHistory.length === 0) {
+        setIsAnalyzing(false);
+        setAnalysis(null);
         return;
       }
-      setIsLoading(true);
+      
+      setIsAnalyzing(true);
       setError(null);
       try {
         const result = await analyzeMistakes({ quizHistory });
@@ -62,14 +66,14 @@ export default function ReflectionPage() {
         setError('Failed to analyze mistakes. Please try again later.');
         console.error(e);
       } finally {
-        setIsLoading(false);
+        setIsAnalyzing(false);
       }
     };
 
     analyze();
-  }, [quizHistory]);
+  }, [quizHistory, isLoadingHistory]);
 
-  if (isLoading) {
+  if (isAnalyzing || isLoadingHistory) {
     return (
       <div className="flex h-full min-h-[60vh] flex-col items-center justify-center">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
@@ -91,13 +95,13 @@ export default function ReflectionPage() {
     );
   }
   
-  if (!analysis) {
+  if (!analysis || analysis.commonThemes.length === 0) {
      return (
         <div className="flex h-full min-h-[60vh] flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center">
             <Lightbulb className="h-16 w-16 text-muted-foreground" />
-            <h2 className="mt-6 text-xl font-semibold">No Quizzes to Analyze</h2>
+            <h2 className="mt-6 text-xl font-semibold">No Mistakes to Analyze</h2>
             <p className="mt-2 text-center text-muted-foreground">
-              Complete some quizzes first, and your AI-powered mistake analysis will appear here.
+              Great job! We couldn't find any recent mistakes. Complete more quizzes, and your AI-powered analysis will appear here if you make any errors.
             </p>
         </div>
     );
@@ -163,3 +167,5 @@ export default function ReflectionPage() {
     </div>
   );
 }
+
+    

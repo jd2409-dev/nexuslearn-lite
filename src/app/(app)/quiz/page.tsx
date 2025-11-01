@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { generateQuiz, QuizQuestion } from '@/ai/flows/quiz-flow';
+import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +37,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Loader2, Sparkles, CheckCircle, XCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   topic: z.string().min(3, 'Topic must be at least 3 characters.'),
@@ -52,6 +55,14 @@ export default function QuizPage() {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [quizFinished, setQuizFinished] = useState(false);
   const [score, setScore] = useState(0);
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const { toast } = useToast();
+
+  const quizAttemptsCollectionRef = useMemoFirebase(
+    () => (user ? collection(firestore, `users/${user.uid}/quizAttempts`) : null),
+    [firestore, user]
+  );
 
   const form = useForm<QuizFormValues>({
     resolver: zodResolver(formSchema),
@@ -73,6 +84,11 @@ export default function QuizPage() {
       setQuiz(generatedQuiz);
     } catch (error) {
       console.error('Failed to generate quiz:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Quiz Generation Failed',
+        description: 'There was an error generating the quiz. Please try again.',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -93,20 +109,51 @@ export default function QuizPage() {
     }
   };
   
-  const finishQuiz = () => {
-    if (!quiz) return;
+  const finishQuiz = async () => {
+    if (!quiz || !user || !quizAttemptsCollectionRef) return;
+    
     let correctAnswers = 0;
     quiz.forEach((q, index) => {
-      // Case-insensitive comparison for short answers
       const userAnswer = userAnswers[index]?.trim().toLowerCase();
       const correctAnswer = q.correctAnswer?.trim().toLowerCase();
       if (userAnswer === correctAnswer) {
         correctAnswers++;
       }
     });
-    setScore(correctAnswers);
+
+    const finalScore = correctAnswers;
+    setScore(finalScore);
     setQuizFinished(true);
+
+    const quizAttemptData = {
+        userId: user.uid,
+        topic: form.getValues('topic'),
+        score: finalScore,
+        totalQuestions: quiz.length,
+        createdAt: serverTimestamp(),
+        questions: quiz.map((q, index) => ({
+            question: q.question,
+            userAnswer: userAnswers[index] || "",
+            correctAnswer: q.correctAnswer,
+        })),
+    };
+
+    try {
+        await addDoc(quizAttemptsCollectionRef, quizAttemptData);
+        toast({
+            title: "Quiz Saved!",
+            description: "Your results have been saved to your reflections.",
+        });
+    } catch (error) {
+        console.error("Error saving quiz attempt:", error);
+        toast({
+            variant: "destructive",
+            title: "Save Failed",
+            description: "Could not save your quiz results. Please try again.",
+        });
+    }
   };
+
 
   const resetQuiz = () => {
     form.reset();
@@ -174,8 +221,8 @@ export default function QuizPage() {
   if (quiz) {
     const currentQuestion = quiz[currentQuestionIndex];
     return (
-       <Form {...form}>
-        <Card className="w-full max-w-2xl mx-auto">
+       <Card className="w-full max-w-2xl mx-auto">
+        <Form {...form}>
           <CardHeader>
             <Progress value={((currentQuestionIndex + 1) / quiz.length) * 100} className="mb-4" />
             <CardTitle>
@@ -204,10 +251,10 @@ export default function QuizPage() {
                         className="flex items-center space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent"
                     >
                         <FormControl>
-                        <RadioGroupItem value={option} />
+                          <RadioGroupItem value={option} />
                         </FormControl>
                         <FormLabel className="font-normal flex-1 cursor-pointer">
-                        {option}
+                          {option}
                         </FormLabel>
                     </FormItem>
                     ))}
@@ -223,8 +270,8 @@ export default function QuizPage() {
               {currentQuestionIndex < quiz.length - 1 ? 'Next Question' : 'Finish Quiz'}
             </Button>
           </CardFooter>
-        </Card>
-      </Form>
+        </Form>
+      </Card>
     );
   }
 
@@ -305,3 +352,4 @@ export default function QuizPage() {
   );
 }
 
+    

@@ -1,3 +1,4 @@
+
 /**
  * @fileoverview Firestore Security Rules for NexusLearn Lite.
  *
@@ -116,6 +117,22 @@ service cloud.firestore {
     }
 
     /**
+     * @description Rules for the /users/{userId}/quizAttempts/{quizAttemptId} collection.
+     * @path /users/{userId}/quizAttempts/{quizAttemptId}
+     * @allow (read) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can read their own quiz attempts.
+     * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create a quiz attempt.
+     * @deny (read, write) User ABC cannot access user DEF's quiz attempts.
+     * @principle Enforces document ownership.
+     */
+    match /users/{userId}/quizAttempts/{quizAttemptId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update: if isExistingOwner(userId);
+        allow delete: if isExistingOwner(userId);
+    }
+
+    /**
      * @description Rules for the /users/{userId}/journalEntries/{journalEntryId} collection.
      * @path /users/{userId}/journalEntries/{journalEntryId}
      * @allow (create) User ZFGwmszpIqRZvYdV1EFVZfyNJk12 can create a journal entry in their own profile.
@@ -161,3 +178,5 @@ service cloud.firestore {
     }
   }
 }
+
+    
