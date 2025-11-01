@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GoogleAIFileManager } from "@google/generative-ai/server";
 
 export const runtime = 'edge';
 
@@ -7,8 +6,8 @@ export async function POST(req: Request) {
   const { prompt } = await req.json();
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: "API key not found" }), { status: 500 });
+  if (!apiKey || apiKey === "YOUR_API_KEY_HERE") {
+    return new Response(JSON.stringify({ error: "API key not found or not configured" }), { status: 500 });
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
