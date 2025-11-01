@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Bot, Send } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Bot, Send, User as UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,28 +17,60 @@ export default function AiChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Mock AI response for demo - replace with real AI API call
-  const getAiResponse = async (userMessage: string) => {
-    return new Promise<string>((resolve) => {
-      setTimeout(() => {
-        resolve(`This is a mocked AI response to: "${userMessage}"`);
-      }, 1000);
-    });
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage: Message = { from: "user", text: input.trim() };
-    setMessages((msgs) => [...msgs, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
-    
-    // Get AI response
-    const botReply = await getAiResponse(userMessage.text);
-    setMessages((msgs) => [...msgs, { from: "bot", text: botReply }]);
-    setLoading(false);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: input.trim() }),
+      });
+
+      if (!response.body) {
+        throw new Error("No response body");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let botMessage = "";
+
+      setMessages((prev) => [...prev, { from: "bot", text: "" }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        botMessage += chunk;
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1].text = botMessage;
+          return newMessages;
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching AI response:", error);
+      setMessages((prev) => [...prev, { from: "bot", text: "Sorry, something went wrong." }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -69,7 +101,9 @@ export default function AiChatPage() {
           >
             {msg.from === "bot" && (
               <Avatar>
-                <AvatarFallback>AI</AvatarFallback>
+                 <AvatarFallback>
+                  <Bot className="h-5 w-5" />
+                </AvatarFallback>
               </Avatar>
             )}
             <div
@@ -84,15 +118,17 @@ export default function AiChatPage() {
              {msg.from === "user" && (
               <Avatar>
                 <AvatarImage src={user?.photoURL || undefined} />
-                <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
+                <AvatarFallback>{user?.displayName?.charAt(0) || <UserIcon className="h-5 w-5" />}</AvatarFallback>
               </Avatar>
             )}
           </div>
         ))}
-        {loading && (
+        {loading && messages[messages.length -1].from === 'user' && (
           <div className="flex items-start gap-4 justify-start">
              <Avatar>
-                <AvatarFallback>AI</AvatarFallback>
+                <AvatarFallback>
+                  <Bot className="h-5 w-5" />
+                </AvatarFallback>
               </Avatar>
             <div className="max-w-[70%] rounded-lg p-3 bg-secondary text-secondary-foreground">
               <div className="flex items-center gap-2">
@@ -103,6 +139,7 @@ export default function AiChatPage() {
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
       <div className="border-t p-4 bg-card">
         <div className="relative">
