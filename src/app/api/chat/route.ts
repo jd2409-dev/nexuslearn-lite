@@ -5,13 +5,17 @@ export async function POST(req: Request) {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey === "YOUR_API_KEY_HERE") {
-    return new Response(JSON.stringify({ error: "API key not found or not configured" }), { status: 500 });
+    console.error("Gemini API key not found or not configured.");
+    return new Response(JSON.stringify({ error: { message: "API key not found or not configured. Please set GEMINI_API_KEY in your .env file." } }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
   try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
     const result = await model.generateContent(prompt);
     const response = result.response;
     const text = response.text();
@@ -23,7 +27,10 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error(error);
-    return new Response(JSON.stringify({ error: "Failed to generate content" }), { status: 500 });
+    console.error("Failed to generate content:", error);
+    return new Response(JSON.stringify({ error: { message: "Failed to generate content from the AI model." } }), { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
