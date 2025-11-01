@@ -1,3 +1,4 @@
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
@@ -24,7 +25,8 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error("Failed to generate content:", error);
-    return NextResponse.json({ error: { message: "Failed to generate content from the AI model." } }, { 
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    return NextResponse.json({ error: { message: "Failed to generate content from the AI model.", details: errorMessage } }, { 
         status: 500,
     });
   }
