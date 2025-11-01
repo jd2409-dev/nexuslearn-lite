@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 async function getGeminiResponse(prompt: string, apiKey: string) {
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
 
     const result = await model.generateContent(prompt);
     const response = result.response;
