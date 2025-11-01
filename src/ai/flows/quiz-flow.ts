@@ -11,7 +11,6 @@ import {
   QuizOutputSchema,
   type QuizInput,
 } from '@/ai/schemas/quiz-schemas';
-import { googleAI } from "@genkit-ai/google-genai";
 
 export async function generateQuiz(input: QuizInput): Promise<QuizQuestion[]> {
   // Directly call the flow with the provided input.
@@ -22,8 +21,8 @@ export async function generateQuiz(input: QuizInput): Promise<QuizQuestion[]> {
 // Genkit prompt for the Gemini model
 const quizPrompt = ai.definePrompt({
   name: 'quizPrompt',
-  // Specify the model directly using the googleAI plugin helper.
-  model: googleAI('gemini-2.5-flash'),
+  // Specify the model directly as a string.
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: QuizInputSchema },
   output: { schema: QuizOutputSchema },
   prompt: `
