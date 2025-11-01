@@ -1,52 +1,64 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Book, Plus, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Book, Plus, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, addDoc, doc, setDoc, deleteDoc, serverTimestamp, orderBy, query } from "firebase/firestore";
+import { Loader2 } from "lucide-react";
 
 type JournalEntry = {
-  id: number;
+  id: string;
   title: string;
   content: string;
-  createdAt: Date;
+  createdAt: any; 
   subject: string;
 };
 
-const initialEntries: JournalEntry[] = [
-  {
-    id: 1,
-    title: "Key Concepts of Photosynthesis",
-    content: "Chlorophyll is the pigment that absorbs sunlight. The process is divided into light-dependent and light-independent reactions. ATP and NADPH are energy carriers.",
-    createdAt: new Date("2023-10-26T10:00:00Z"),
-    subject: "Biology",
-  },
-  {
-    id: 2,
-    title: "Newton's Laws of Motion",
-    content: "1. Inertia: An object at rest stays at rest. 2. F=ma: Force equals mass times acceleration. 3. Action-Reaction: Every action has an equal and opposite reaction.",
-    createdAt: new Date("2023-10-25T14:30:00Z"),
-    subject: "Physics",
-  },
-];
-
 export default function JournalPage() {
-  const [entries, setEntries] = useState<JournalEntry[]>(initialEntries);
-  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(entries[0] || null);
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const journalCollectionRef = useMemoFirebase(() =>
+    user ? collection(firestore, `users/${user.uid}/journalEntries`) : null
+  , [firestore, user]);
+
+  const journalQuery = useMemoFirebase(() =>
+    journalCollectionRef ? query(journalCollectionRef, orderBy("createdAt", "desc")) : null
+  , [journalCollectionRef]);
+
+  const { data: entries, isLoading } = useCollection<Omit<JournalEntry, 'id'>>(journalQuery);
+
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
+  useEffect(() => {
+    if (!isLoading && entries && entries.length > 0 && !selectedEntry) {
+      const firstEntry = entries[0];
+      setSelectedEntry({
+        ...firstEntry,
+        createdAt: firstEntry.createdAt?.toDate(), 
+      });
+    }
+  }, [entries, isLoading, selectedEntry]);
+
   const handleSelectEntry = (entry: JournalEntry) => {
-    setSelectedEntry(entry);
+    setSelectedEntry({
+      ...entry,
+      createdAt: entry.createdAt?.toDate ? entry.createdAt.toDate() : new Date(entry.createdAt),
+    });
     setIsCreating(false);
   };
   
   const handleCreateNew = () => {
     const newEntry: JournalEntry = {
-      id: Date.now(),
+      id: `new-${Date.now()}`, 
       title: "New Entry",
       content: "",
       createdAt: new Date(),
@@ -56,21 +68,34 @@ export default function JournalPage() {
     setIsCreating(true);
   }
 
-  const handleSaveEntry = () => {
-    if (!selectedEntry) return;
+  const handleSaveEntry = async () => {
+    if (!selectedEntry || !user) return;
+    
+    const entryData = {
+        title: selectedEntry.title,
+        content: selectedEntry.content,
+        subject: selectedEntry.subject,
+        createdAt: isCreating ? serverTimestamp() : selectedEntry.createdAt,
+    };
 
     if (isCreating) {
-      setEntries([selectedEntry, ...entries]);
+      if (journalCollectionRef) {
+        const docRef = await addDoc(journalCollectionRef, entryData);
+        setSelectedEntry({ ...selectedEntry, id: docRef.id, createdAt: new Date() });
+      }
       setIsCreating(false);
     } else {
-      setEntries(entries.map(e => e.id === selectedEntry.id ? selectedEntry : e));
+      const entryDocRef = doc(firestore, `users/${user.uid}/journalEntries`, selectedEntry.id);
+      await setDoc(entryDocRef, { ...entryData, createdAt: selectedEntry.createdAt }, { merge: true });
     }
   }
 
-  const handleDeleteEntry = (id: number) => {
-    setEntries(entries.filter(e => e.id !== id));
+  const handleDeleteEntry = async (id: string) => {
+    if (!user || isCreating) return;
+    const entryDocRef = doc(firestore, `users/${user.uid}/journalEntries`, id);
+    await deleteDoc(entryDocRef);
     if (selectedEntry?.id === id) {
-        setSelectedEntry(entries.length > 1 ? entries[1] : null);
+        setSelectedEntry(entries && entries.length > 1 ? entries[0] : null);
     }
   }
 
@@ -90,7 +115,8 @@ export default function JournalPage() {
           </Button>
         </div>
         <div className="flex-1 overflow-auto">
-          {entries.map((entry) => (
+          {isLoading && <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>}
+          {entries?.map((entry) => (
             <button
               key={entry.id}
               className={`flex w-full flex-col items-start gap-1 border-b p-4 text-left ${selectedEntry?.id === entry.id ? "bg-secondary" : ""}`}
@@ -99,7 +125,7 @@ export default function JournalPage() {
               <div className="flex w-full items-center">
                 <div className="font-semibold">{entry.title}</div>
                 <div className="ml-auto text-xs text-muted-foreground">
-                  {format(entry.createdAt, "MMM d")}
+                  {entry.createdAt?.toDate && format(entry.createdAt.toDate(), "MMM d")}
                 </div>
               </div>
               <div className="text-xs text-muted-foreground">{entry.subject}</div>
@@ -119,7 +145,7 @@ export default function JournalPage() {
                   className="text-lg font-bold border-0 shadow-none focus-visible:ring-0"
                 />
                 <div className="flex items-center gap-2 text-xs text-muted-foreground px-3">
-                  <span>{format(selectedEntry.createdAt, "PPPp")}</span>
+                  <span>{selectedEntry.createdAt ? format(selectedEntry.createdAt, "PPPp") : 'Just now'}</span>
                    |
                   <Input 
                     value={selectedEntry.subject} 
@@ -131,7 +157,7 @@ export default function JournalPage() {
               <Button onClick={handleSaveEntry}>Save</Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" disabled={isCreating}>
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -156,14 +182,17 @@ export default function JournalPage() {
             <Book className="h-16 w-16 text-muted-foreground" />
             <h2 className="mt-6 text-xl font-semibold">Your Learning Journal</h2>
             <p className="mt-2 text-center text-muted-foreground">
-              Select an entry to view it, or create a new one to get started.
+              {isLoading ? "Loading your journal..." : (entries && entries.length > 0 ? "Select an entry to view it." : "Create a new entry to get started.")}
             </p>
-            <Button className="mt-4" onClick={handleCreateNew}>
-              <Plus className="mr-2 h-4 w-4" /> Create New Entry
-            </Button>
+            {!isLoading && (!entries || entries.length === 0) && (
+              <Button className="mt-4" onClick={handleCreateNew}>
+                <Plus className="mr-2 h-4 w-4" /> Create New Entry
+              </Button>
+            )}
           </div>
         )}
       </div>
     </div>
   );
 }
+
