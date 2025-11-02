@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import { Loader2, Sparkles, Star, Clipboard, Check } from 'lucide-react';
+import { Loader2, Sparkles, Star, Clipboard, Check, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { gradeEssay, GradeEssayOutput } from '@/ai/flows/essay-grader-flow';
+import { Badge } from '@/components/ui/badge';
 
 export default function EssayGraderPage() {
   const [essay, setEssay] = useState('');
@@ -32,6 +33,9 @@ export default function EssayGraderPage() {
     if (!result) return;
     const feedbackText = `
 Grade: ${result.grade}
+
+AI Detection: ${result.aiDetection.isLikelyAiGenerated ? 'Likely AI-Generated' : 'Likely Human-Written'}
+Explanation: ${result.aiDetection.explanation}
 
 Strengths:
 ${result.strengths.map(s => `- ${s}`).join('\n')}
@@ -115,6 +119,22 @@ ${result.revisedEssay}
                   <div>
                     <h3 className="font-semibold text-lg">Overall Grade: {result.grade}</h3>
                   </div>
+                  
+                  <div className="p-4 border rounded-lg bg-secondary/50">
+                    <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                        {result.aiDetection.isLikelyAiGenerated ? (
+                            <ShieldAlert className="h-5 w-5 text-destructive" />
+                        ) : (
+                            <ShieldCheck className="h-5 w-5 text-green-600" />
+                        )}
+                       AI Content Analysis
+                    </h3>
+                    <Badge variant={result.aiDetection.isLikelyAiGenerated ? 'destructive' : 'secondary'}>
+                        {result.aiDetection.isLikelyAiGenerated ? 'Likely AI-Generated' : 'Likely Human-Written'}
+                    </Badge>
+                    <p className="text-muted-foreground text-sm mt-2">{result.aiDetection.explanation}</p>
+                  </div>
+
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Strengths</h3>
                     <ul className="list-disc list-inside space-y-1 text-green-700 dark:text-green-400">
