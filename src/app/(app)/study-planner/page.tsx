@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { addDays, startOfToday } from 'date-fns';
 import {
   Form,
   FormControl,
@@ -17,8 +18,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Sparkles, CalendarDays, CheckSquare, BookOpen, Clock } from 'lucide-react';
 import { generateStudyPlan, StudyPlan } from '@/ai/flows/study-planner-flow';
-import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
+
 
 const formSchema = z.object({
   goal: z.string().min(10, 'Please provide a more detailed goal.'),
@@ -32,6 +36,9 @@ export default function StudyPlannerPage() {
   const [plan, setPlan] = useState<StudyPlan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -49,6 +56,27 @@ export default function StudyPlannerPage() {
     try {
       const result = await generateStudyPlan(values);
       setPlan(result);
+      if (user && firestore && result.dailyBreakdown) {
+        const studyGoalsCollection = collection(firestore, `users/${user.uid}/studyGoals`);
+        const today = startOfToday();
+        
+        for (const day of result.dailyBreakdown) {
+          const goal = {
+            goalDescription: day.topic,
+            dueDate: addDays(today, day.day - 1),
+            completed: false,
+            userId: user.uid,
+            createdAt: serverTimestamp(),
+          };
+          await addDoc(studyGoalsCollection, goal);
+        }
+        
+        toast({
+          title: "Study Plan Saved!",
+          description: "Your daily goals have been added to your dashboard.",
+        });
+      }
+
     } catch (e) {
       setError('Failed to generate study plan. Please try again.');
       console.error(e);
