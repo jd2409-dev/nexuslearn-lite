@@ -317,6 +317,44 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "status", "options", "pdfStoragePath", "createdAt", "updatedAt"]
+    },
+    "FlashcardSet": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FlashcardSet",
+      "description": "A set of flashcards on a specific topic.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "topic": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "cards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": { "type": "string" },
+              "answer": { "type": "string" }
+            },
+            "required": ["question", "answer"]
+          }
+        }
+      },
+      "required": ["userId", "topic", "createdAt", "cards"]
+    },
+    "MindMap": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MindMap",
+      "description": "A mind map generated from a topic or text.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "topic": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "mapData": { "type": "string", "description": "The mind map data, likely in a structured format like JSON or a specific DSL (e.g., Mermaid)." }
+      },
+      "required": ["userId", "topic", "createdAt", "mapData"]
     }
   },
   "auth": {
@@ -484,8 +522,26 @@
           },
           "description": "Stores jobs for converting PDFs to podcasts. Path-based ownership ensures only the authenticated user can access their jobs."
         }
+      },
+      {
+        "path": "/users/{userId}/flashcardSets/{flashcardSetId}",
+        "definition": {
+          "entityName": "FlashcardSet",
+          "schema": { "$ref": "#/backend/entities/FlashcardSet" },
+          "description": "Stores user-generated sets of flashcards. Path-based ownership ensures data privacy."
+        }
+      },
+      {
+        "path": "/users/{userId}/mindMaps/{mindMapId}",
+        "definition": {
+          "entityName": "MindMap",
+          "schema": { "$ref": "#/backend/entities/MindMap" },
+          "description": "Stores user-generated mind maps. Path-based ownership ensures data privacy."
+        }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis`, `QuizAttempt`, and `PodcastJob` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis`, `QuizAttempt`, `PodcastJob`, `FlashcardSet`, and `MindMap` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
   }
 }
+
+    

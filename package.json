@@ -42,6 +42,7 @@
     "firebase": "^10.12.3",
     "genkit": "1.21.0",
     "lucide-react": "^0.475.0",
+    "mermaid": "^10.9.1",
     "next": "15.3.5",
     "pdf-parse": "^1.1.1",
     "react": "^18.3.1",
@@ -65,3 +66,5 @@
     "typescript": "^5"
   }
 }
+
+    

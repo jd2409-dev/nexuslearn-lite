@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -20,6 +21,8 @@ import {
   FileText,
   CalendarDays,
   Podcast,
+  FileBox,
+  Brain,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +32,8 @@ const navItems = [
   { href: "/quiz", icon: ClipboardCheck, label: "Quizzes" },
   { href: "/essay-grader", icon: FileText, label: "Essay Grader" },
   { href: "/study-planner", icon: CalendarDays, label: "Study Planner" },
+  { href: "/flashcards", icon: FileBox, label: "Flashcards" },
+  { href: "/mind-maps", icon: Brain, label: "Mind Maps" },
   { href: "/podcast", icon: Podcast, label: "PDF to Podcast" },
   { href: "/journal", icon: Book, label: "Journal" },
   { href: "/pomodoro", icon: Timer, label: "Pomodoro" },
@@ -89,3 +94,5 @@ export default function AppSidebar() {
     </aside>
   );
 }
+
+    

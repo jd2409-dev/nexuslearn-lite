@@ -191,5 +191,25 @@ service cloud.firestore {
       allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
     }
+    
+    /**
+     * @description Rules for flashcard sets.
+     * @path /users/{userId}/flashcardSets/{flashcardSetId}
+     * @principle Enforces user ownership.
+     */
+    match /users/{userId}/flashcardSets/{flashcardSetId} {
+      allow get, list, create, update, delete: if isOwner(userId);
+    }
+
+    /**
+     * @description Rules for mind maps.
+     * @path /users/{userId}/mindMaps/{mindMapId}
+     * @principle Enforces user ownership.
+     */
+    match /users/{userId}/mindMaps/{mindMapId} {
+      allow get, list, create, update, delete: if isOwner(userId);
+    }
   }
 }
+
+    
