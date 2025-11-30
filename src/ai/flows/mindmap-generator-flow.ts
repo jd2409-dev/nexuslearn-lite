@@ -5,21 +5,8 @@
  */
 
 import { ai } from "@/ai/genkit";
-import { z } from "zod";
+import { MindMapInputSchema, MindMapOutputSchema, type MindMapInput, type MindMapOutput } from "@/ai/schemas/mindmap-schemas";
 import * as pdfParse from "pdf-parse";
-
-// Input schema for the flow
-export const MindMapInputSchema = z.object({
-  text: z.string().describe("The source text to generate the mind map from."),
-  topic: z.string().describe("The central topic of the mind map."),
-});
-export type MindMapInput = z.infer<typeof MindMapInputSchema>;
-
-// Output schema for the flow
-export const MindMapOutputSchema = z.object({
-  mapData: z.string().describe("A mind map visualization in Mermaid JS graph syntax."),
-});
-export type MindMapOutput = z.infer<typeof MindMapOutputSchema>;
 
 /**
  * Converts PDF data URI to text.
@@ -87,5 +74,3 @@ const mindMapGeneratorFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    

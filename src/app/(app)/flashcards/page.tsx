@@ -7,7 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useUser, useFirestore } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { generateFlashcards, getPdfText, FlashcardOutput } from '@/ai/flows/flashcard-generator-flow';
+import { generateFlashcards, getPdfText } from '@/ai/flows/flashcard-generator-flow';
+import { type FlashcardOutput } from '@/ai/schemas/flashcard-schemas';
 import { useToast } from '@/hooks/use-toast';
 
 import { Button } from '@/components/ui/button';
@@ -46,10 +47,10 @@ const FlashcardViewer = ({ card, isFlipped, onClick }: { card: Flashcard, isFlip
             style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
             onClick={onClick}
         >
-            <div className="absolute w-full h-full backface-hidden flex items-center justify-center">
+            <div className="absolute w-full h-full flex items-center justify-center" style={{ backfaceVisibility: 'hidden' }}>
                 <p className="text-xl font-semibold">{card.question}</p>
             </div>
-            <div className="absolute w-full h-full backface-hidden flex items-center justify-center" style={{ transform: 'rotateY(180deg)' }}>
+            <div className="absolute w-full h-full flex items-center justify-center" style={{ transform: 'rotateY(180deg)', backfaceVisibility: 'hidden' }}>
                 <p className="text-lg">{card.answer}</p>
             </div>
         </div>
@@ -234,5 +235,3 @@ export default function FlashcardsPage() {
     </div>
   );
 }
-
-    

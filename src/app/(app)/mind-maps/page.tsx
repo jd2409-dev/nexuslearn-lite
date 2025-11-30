@@ -7,7 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useUser, useFirestore } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { generateMindMap, getPdfText, MindMapOutput } from '@/ai/flows/mindmap-generator-flow';
+import { generateMindMap, getPdfText } from '@/ai/flows/mindmap-generator-flow';
+import { type MindMapOutput } from '@/ai/schemas/mindmap-schemas';
 import { useToast } from '@/hooks/use-toast';
 import mermaid from 'mermaid';
 
@@ -47,7 +48,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
     }
   }, [chart]);
 
-  return <div ref={ref}>{chart}</div>;
+  return <div ref={ref} className="mermaid">{chart}</div>;
 };
 
 export default function MindMapsPage() {
@@ -179,7 +180,7 @@ export default function MindMapsPage() {
                     <CardTitle>{form.getValues('topic')}</CardTitle>
                     <Button onClick={handleSave} size="sm"><Save className="mr-2 h-4 w-4"/> Save Map</Button>
                 </CardHeader>
-                <CardContent className="min-h-[400px]">
+                <CardContent className="min-h-[400px] overflow-auto">
                     <Mermaid chart={result.mapData} />
                 </CardContent>
             </Card>
@@ -194,5 +195,3 @@ export default function MindMapsPage() {
     </div>
   );
 }
-
-    
