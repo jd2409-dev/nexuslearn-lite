@@ -6,7 +6,7 @@
  * This ruleset enforces a strict user-ownership model for all data. Each user has a dedicated data tree under `/users/{userId}`, and only the authenticated user can read or write data within their own tree.
  *
  * Data Structure:
- * All data is nested under the `/users/{userId}` collection. This includes user profiles, achievements, study goals, quizzes, journal entries, pomodoro sessions, and mistake analyses.
+ * All data is nested under the `/users/{userId}` collection. This includes user profiles, achievements, study goals, quizzes, journal entries, pomodoro sessions, mistake analyses, and podcast jobs.
  *
  * Key Security Decisions:
  * - User listing is disallowed to protect user privacy.
@@ -176,7 +176,20 @@ service cloud.firestore {
       allow update: if isExistingOwner(userId);
       allow delete: if isExistingOwner(userId);
     }
+
+    /**
+     * @description Rules for the /users/{userId}/podcastJobs/{jobId} collection.
+     * @path /users/{userId}/podcastJobs/{jobId}
+     * @allow (read, write) User can access their own podcast jobs.
+     * @deny (read, write) User cannot access another user's podcast jobs.
+     * @principle Enforces document ownership.
+     */
+    match /users/{userId}/podcastJobs/{jobId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
   }
 }
-
-    

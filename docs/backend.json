@@ -292,6 +292,31 @@
         }
       },
       "required": ["userId", "topic", "score", "totalQuestions", "createdAt", "questions"]
+    },
+    "PodcastJob": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PodcastJob",
+      "description": "Represents a job to convert a PDF to a podcast.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the job." },
+        "userId": { "type": "string", "description": "The ID of the user who created the job." },
+        "status": { "type": "string", "enum": ["queued", "extracting_text", "generating_script", "generating_audio", "completed", "error"], "description": "The current status of the job." },
+        "options": {
+          "type": "object",
+          "properties": {
+            "length": { "type": "string", "enum": ["short", "medium", "long"] },
+            "tone": { "type": "string", "enum": ["formal", "casual", "explainer"] }
+          }
+        },
+        "pdfStoragePath": { "type": "string", "description": "The path to the uploaded PDF in Firebase Storage." },
+        "audioUrl": { "type": "string", "description": "The public URL for the generated audio file." },
+        "transcript": { "type": "string", "description": "The generated podcast script." },
+        "errorMessage": { "type": "string", "description": "An error message if the job failed." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "status", "options", "pdfStoragePath", "createdAt", "updatedAt"]
     }
   },
   "auth": {
@@ -449,10 +474,18 @@
             }
           ]
         }
+      },
+      {
+        "path": "/users/{userId}/podcastJobs/{jobId}",
+        "definition": {
+          "entityName": "PodcastJob",
+          "schema": {
+            "$ref": "#/backend/entities/PodcastJob"
+          },
+          "description": "Stores jobs for converting PDFs to podcasts. Path-based ownership ensures only the authenticated user can access their jobs."
+        }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis`, and `QuizAttempt` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the NexusLearn Lite application. User-owned data is stored under `/users/{userId}` for simplified security rules.  Denormalization is applied where necessary to avoid `get()` calls in security rules, ensuring atomic operations and easy debugging. The structure supports the required QAPs through segregation (separating user-specific data) and path-based ownership, allowing secure list operations. For example, all user data is stored within the `/users/{userId}` path to limit access to the authenticated user only. All `StudyGoal`, `Quiz`, `JournalEntry`, `PomodoroSession`, `MistakeAnalysis`, `QuizAttempt`, and `PodcastJob` are nested under `/users/{userId}` to leverage path-based ownership and avoid complex rules. This approach ensures data integrity and simplifies security management by aligning closely with Firebase's recommended practices."
   }
 }
-
-    

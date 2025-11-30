@@ -19,6 +19,7 @@ import {
   Settings,
   FileText,
   CalendarDays,
+  Podcast,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/quiz", icon: ClipboardCheck, label: "Quizzes" },
   { href: "/essay-grader", icon: FileText, label: "Essay Grader" },
   { href: "/study-planner", icon: CalendarDays, label: "Study Planner" },
+  { href: "/podcast", icon: Podcast, label: "PDF to Podcast" },
   { href: "/journal", icon: Book, label: "Journal" },
   { href: "/pomodoro", icon: Timer, label: "Pomodoro" },
   { href: "/reflection", icon: Lightbulb, label: "Reflection" },

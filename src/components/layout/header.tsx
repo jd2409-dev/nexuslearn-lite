@@ -14,7 +14,8 @@ import {
   Search,
   FileText,
   CalendarDays,
-  LogOut
+  LogOut,
+  Podcast
 } from "lucide-react"
 import { signOut } from "firebase/auth";
 
@@ -40,6 +41,7 @@ const navItems = [
   { href: "/quiz", icon: ClipboardCheck, label: "Quizzes" },
   { href: "/essay-grader", icon: FileText, label: "Essay Grader" },
   { href: "/study-planner", icon: CalendarDays, label: "Study Planner" },
+  { href: "/podcast", icon: Podcast, label: "PDF to Podcast" },
   { href: "/journal", icon: Book, label: "Journal" },
   { href: "/pomodoro", icon: Timer, label: "Pomodoro" },
   { href: "/reflection", icon: Lightbulb, label: "Reflection" },
@@ -51,6 +53,7 @@ const pageTitles: { [key: string]: string } = {
   "/quiz": "Quiz Generator",
   "/essay-grader": "Essay Grader",
   "/study-planner": "Study Planner",
+  "/podcast": "PDF to Podcast",
   "/journal": "Learning Journal",
   "/pomodoro": "Pomodoro Timer",
   "/reflection": "Reflection",
