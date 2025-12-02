@@ -1,3 +1,4 @@
+
 "use server";
 /**
  * @fileOverview A Genkit flow for converting a PDF into a conversational podcast.
@@ -9,19 +10,16 @@ import { ai } from "@/ai/genkit";
 import { z } from "zod";
 import * as pdfParse from "pdf-parse";
 import wav from "wav";
-import {
-  doc,
-  updateDoc,
-  getFirestore,
-  serverTimestamp,
-} from "firebase/firestore";
-import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
-import { initializeFirebase } from "@/firebase";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
+import { initializeApp, getApps } from "firebase-admin/app";
 
 // Initialize Firebase Admin SDK for backend usage
-const firebaseApp = initializeFirebase().firebaseApp;
-const db = getFirestore(firebaseApp!);
-const storage = getStorage(firebaseApp!);
+if (!getApps().length) {
+  initializeApp();
+}
+const db = getFirestore();
+const storage = getStorage();
 
 
 // Input schema for the main flow
@@ -61,8 +59,8 @@ export async function generatePdfPodcast(input: PdfToPodcastInput) {
 
 async function updateJobStatus(userId: string, jobId: string, data: any) {
   if (!userId || !jobId) return;
-  const jobRef = doc(db, `users/${userId}/podcastJobs`, jobId);
-  await updateDoc(jobRef, { ...data, updatedAt: serverTimestamp() });
+  const jobRef = db.collection('users').doc(userId).collection('podcastJobs').doc(jobId);
+  await jobRef.update({ ...data, updatedAt: FieldValue.serverTimestamp() });
 }
 
 // Main Genkit Flow
@@ -126,8 +124,8 @@ const pdfToPodcastFlow = ai.defineFlow(
             speechConfig: {
               multiSpeakerVoiceConfig: {
                 speakerVoiceConfigs: [
-                  { speaker: 'Speaker1', voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Algenib' } } },
-                  { speaker: 'Speaker2', voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Achernar' } } },
+                  { speaker: 'Speaker 1', voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Algenib' } } },
+                  { speaker: 'Speaker 2', voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Achernar' } } },
                 ]
               }
             }
@@ -146,13 +144,23 @@ const pdfToPodcastFlow = ai.defineFlow(
       // 4. Combine audio buffers into a single WAV file
       const combinedPcm = Buffer.concat(audioBuffers);
       const wavBase64 = await toWav(combinedPcm);
-      const audioDataUrl = `data:audio/wav;base64,${wavBase64}`;
       
       // 5. Upload to Firebase Storage
       const audioPath = `podcasts/${userId}/${jobId}.wav`;
-      const storageRef = ref(storage, audioPath);
-      await uploadString(storageRef, audioDataUrl, 'data_url');
-      const downloadUrl = await getDownloadURL(storageRef);
+      const bucket = storage.bucket();
+      const file = bucket.file(audioPath);
+      const buffer = Buffer.from(wavBase64, 'base64');
+      await file.save(buffer, {
+          metadata: {
+              contentType: 'audio/wav',
+          },
+      });
+
+      const [downloadUrl] = await file.getSignedUrl({
+          action: 'read',
+          expires: '03-09-2491'
+      });
+
 
       // 6. Finalize Job
       await updateJobStatus(userId, jobId, {
