@@ -12,14 +12,17 @@ import * as pdfParse from "pdf-parse";
 import wav from "wav";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
-import { initializeApp, getApps } from "firebase-admin/app";
+import { initializeApp, getApps, App } from "firebase-admin/app";
 
 // Initialize Firebase Admin SDK for backend usage
+let adminApp: App;
 if (!getApps().length) {
-  initializeApp();
+  adminApp = initializeApp();
+} else {
+  adminApp = getApps()[0];
 }
-const db = getFirestore();
-const storage = getStorage();
+const db = getFirestore(adminApp);
+const storage = getStorage(adminApp);
 
 
 // Input schema for the main flow
