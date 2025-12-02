@@ -10,19 +10,7 @@ import { ai } from "@/ai/genkit";
 import { z } from "zod";
 import * as pdfParse from "pdf-parse";
 import wav from "wav";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import { getStorage } from "firebase-admin/storage";
-import { initializeApp, getApps, App } from "firebase-admin/app";
-
-// Initialize Firebase Admin SDK for backend usage
-let adminApp: App;
-if (!getApps().length) {
-  adminApp = initializeApp();
-} else {
-  adminApp = getApps()[0];
-}
-const db = getFirestore(adminApp);
-const storage = getStorage(adminApp);
+import { db, storage } from "@/firebase/server";
 
 
 // Input schema for the main flow
@@ -63,7 +51,7 @@ export async function generatePdfPodcast(input: PdfToPodcastInput) {
 async function updateJobStatus(userId: string, jobId: string, data: any) {
   if (!userId || !jobId) return;
   const jobRef = db.collection('users').doc(userId).collection('podcastJobs').doc(jobId);
-  await jobRef.update({ ...data, updatedAt: FieldValue.serverTimestamp() });
+  await jobRef.update({ ...data, updatedAt: new Date() });
 }
 
 // Main Genkit Flow

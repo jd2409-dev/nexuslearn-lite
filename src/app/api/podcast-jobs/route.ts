@@ -1,19 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import { getStorage } from 'firebase-admin/storage';
-import { initializeApp, getApps } from 'firebase-admin/app';
+import { auth, db, storage } from '@/firebase/server';
 import { generatePdfPodcast } from '@/ai/flows/podcast-flow';
 import { randomUUID } from 'crypto';
-
-// Initialize Firebase Admin SDK
-if (!getApps().length) {
-  initializeApp();
-}
-const auth = getAuth();
-const db = getFirestore();
-const storage = getStorage();
 
 export async function POST(req: Request) {
   const token = req.headers.get('Authorization')?.split('Bearer ')[1];
@@ -65,8 +54,8 @@ export async function POST(req: Request) {
       status: 'queued',
       options: { length, tone },
       pdfStoragePath,
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     await jobRef.set(jobData);
 
