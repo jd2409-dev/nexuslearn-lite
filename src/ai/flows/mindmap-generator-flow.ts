@@ -6,18 +6,8 @@
 
 import { ai } from "@/ai/genkit";
 import { MindMapInputSchema, MindMapOutputSchema, type MindMapInput, type MindMapOutput } from "@/ai/schemas/mindmap-schemas";
-import * as pdfParse from "pdf-parse";
+import { getPdfText } from "@/lib/pdf-utils";
 
-/**
- * Converts PDF data URI to text.
- * @param pdfDataUri - The PDF file encoded as a data URI.
- * @returns The extracted text from the PDF.
- */
-export async function getPdfText(pdfDataUri: string): Promise<string> {
-    const pdfBuffer = Buffer.from(pdfDataUri.split(",")[1], "base64");
-    const data = await pdfParse(pdfBuffer);
-    return data.text;
-}
 
 /**
  * Main exported function to generate a mind map.
