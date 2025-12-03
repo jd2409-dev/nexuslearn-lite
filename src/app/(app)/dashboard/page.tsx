@@ -111,6 +111,7 @@ export default function Dashboard() {
 
 
   const studyChallenges = studyGoals?.map(goal => ({
+      id: goal.id,
       title: goal.goalDescription,
       completed: goal.completed,
   })) || [];
@@ -186,7 +187,7 @@ export default function Dashboard() {
                         </TableHeader>
                         <TableBody>
                             {studyChallenges.map(challenge => (
-                                <TableRow key={challenge.title} className={challenge.completed ? 'text-muted-foreground line-through' : ''}>
+                                <TableRow key={challenge.id} className={challenge.completed ? 'text-muted-foreground line-through' : ''}>
                                     <TableCell>
                                         <div className="font-medium">{challenge.title}</div>
                                     </TableCell>

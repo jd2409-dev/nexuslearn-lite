@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useToast } from "@/hooks/use-toast"
@@ -9,19 +10,13 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
-import { useEffect, useState } from "react"
 
 export function Toaster() {
   const { toasts } = useToast()
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   return (
     <ToastProvider>
-      {isClient && toasts.map(function ({ id, title, description, action, ...props }) {
+      {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
