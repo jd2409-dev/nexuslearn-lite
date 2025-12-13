@@ -40,7 +40,7 @@
     "firebase": "^10.12.2",
     "genkit": "^0.5.0",
     "lucide-react": "^0.400.0",
-    "next": "15.3.6-canary.33",
+    "next": "15.6.0-canary.60",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
