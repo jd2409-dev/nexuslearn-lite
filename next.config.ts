@@ -3,11 +3,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  experimental: {
-    turbopack: {
-      root: process.cwd(),
-    },
-  },
+  experimental: {},
 };
 
 module.exports = nextConfig;
