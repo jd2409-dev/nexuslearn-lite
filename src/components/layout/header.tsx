@@ -15,9 +15,6 @@ import {
   FileText,
   CalendarDays,
   LogOut,
-  Podcast,
-  FileBox,
-  Brain
 } from "lucide-react"
 import { signOut } from "firebase/auth";
 
@@ -43,9 +40,6 @@ const navItems = [
   { href: "/quiz", icon: ClipboardCheck, label: "Quizzes" },
   { href: "/essay-grader", icon: FileText, label: "Essay Grader" },
   { href: "/study-planner", icon: CalendarDays, label: "Study Planner" },
-  { href: "/flashcards", icon: FileBox, label: "Flashcards" },
-  { href: "/mind-maps", icon: Brain, label: "Mind Maps" },
-  { href: "/podcast", icon: Podcast, label: "PDF to Podcast" },
   { href: "/journal", icon: Book, label: "Journal" },
   { href: "/pomodoro", icon: Timer, label: "Pomodoro" },
   { href: "/reflection", icon: Lightbulb, label: "Reflection" },
@@ -57,9 +51,6 @@ const pageTitles: { [key: string]: string } = {
   "/quiz": "Quiz Generator",
   "/essay-grader": "Essay Grader",
   "/study-planner": "Study Planner",
-  "/flashcards": "Flashcard Generator",
-  "/mind-maps": "Mind Map Generator",
-  "/podcast": "PDF to Podcast",
   "/journal": "Learning Journal",
   "/pomodoro": "Pomodoro Timer",
   "/reflection": "Reflection",
@@ -165,5 +156,3 @@ export default function Header() {
     </header>
   )
 }
-
-    
