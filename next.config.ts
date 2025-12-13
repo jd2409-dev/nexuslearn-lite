@@ -1,14 +1,13 @@
-import type {NextConfig} from 'next';
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // This is the fix for the turbopack root issue.
-  // It tells turbopack that the project root is the current directory.
-  turbopack: {
-    root: __dirname,
+  experimental: {
+    turbopack: {
+      root: process.cwd(),
+    },
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

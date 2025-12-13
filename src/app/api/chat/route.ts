@@ -1,4 +1,3 @@
-
 import { ai } from "@/ai/genkit";
 import { NextResponse } from "next/server";
 
@@ -16,7 +15,7 @@ export async function POST(req: Request) {
       prompt: prompt,
     });
 
-    return NextResponse.json({ text });
+    return NextResponse.json({ text: text });
 
   } catch (error) {
     console.error("API Route Error:", error);

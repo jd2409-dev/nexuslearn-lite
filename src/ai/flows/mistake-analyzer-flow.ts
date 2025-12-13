@@ -12,6 +12,7 @@
 
 import { ai } from "@/ai/genkit";
 import { z } from "zod";
+import Handlebars from 'handlebars';
 
 // Schema for a single question within a quiz attempt
 const QuizQuestionSchema = z.object({
@@ -58,6 +59,11 @@ export type MistakeAnalysis = z.infer<typeof MistakeAnalysisSchema>;
 export async function analyzeMistakes(input: MistakeAnalysisInput): Promise<MistakeAnalysis> {
   return mistakeAnalyzerFlow(input);
 }
+
+// Handlebars 'ne' (not equal) helper
+Handlebars.registerHelper('ne', function (a, b) {
+  return a !== b;
+});
 
 // Define the Genkit prompt for the AI model
 const mistakeAnalyzerPrompt = ai.definePrompt({
@@ -118,9 +124,3 @@ const mistakeAnalyzerFlow = ai.defineFlow(
     return output!;
   }
 );
-// Handlebars 'ne' (not equal) helper
-import Handlebars from 'handlebars';
-Handlebars.registerHelper('ne', function (a, b) {
-  return a !== b;
-});
-

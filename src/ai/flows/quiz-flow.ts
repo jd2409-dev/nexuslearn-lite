@@ -7,9 +7,9 @@
 import { ai } from '@/ai/genkit';
 import {
   QuizInputSchema,
-  QuizQuestion,
   QuizOutputSchema,
   type QuizInput,
+  type QuizQuestion,
 } from '@/ai/schemas/quiz-schemas';
 
 export async function generateQuiz(input: QuizInput): Promise<QuizQuestion[]> {

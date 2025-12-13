@@ -1,11 +1,11 @@
-
 "use client";
 
 import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { generateQuiz, QuizQuestion } from '@/ai/flows/quiz-flow';
+import { generateQuiz } from '@/ai/flows/quiz-flow';
+import type { QuizQuestion } from '@/ai/schemas/quiz-schemas';
 import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -351,5 +351,3 @@ export default function QuizPage() {
     </Card>
   );
 }
-
-    
