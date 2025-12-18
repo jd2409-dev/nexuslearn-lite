@@ -6,9 +6,8 @@ const nextConfig = {
   experimental: {},
   // Explicitly set the project root for Turbopack to resolve the workspace error.
   turbopack: {
-    resolve: {
-      roots: ['.'],
-    },
+    // The correct option is `projectDir`, which sets the root directory for Turbopack.
+    projectDir: __dirname,
   },
 };
 
