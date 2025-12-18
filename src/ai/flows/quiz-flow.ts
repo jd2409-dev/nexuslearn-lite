@@ -22,7 +22,7 @@ export async function generateQuiz(input: QuizInput): Promise<QuizQuestion[]> {
 const quizPrompt = ai.definePrompt({
   name: 'quizPrompt',
   // Specify the model directly as a string.
-  model: 'googleai/gemini-2.5-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: { schema: QuizInputSchema },
   output: { schema: QuizOutputSchema },
   prompt: `

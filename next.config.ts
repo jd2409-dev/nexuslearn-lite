@@ -4,6 +4,12 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   experimental: {},
+  // Explicitly set the project root for Turbopack to resolve the workspace error.
+  turbopack: {
+    resolve: {
+      roots: ['.'],
+    },
+  },
 };
 
 module.exports = nextConfig;

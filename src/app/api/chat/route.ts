@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     // Use Genkit to generate the content, ensuring consistency with other AI flows.
     const { text } = await ai.generate({
-      model: 'googleai/gemini-2.5-flash', // Explicitly define the model
+      model: 'googleai/gemini-1.5-flash-latest', // Explicitly define the model
       prompt: prompt,
     });
 

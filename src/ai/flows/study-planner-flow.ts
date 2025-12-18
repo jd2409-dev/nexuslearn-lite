@@ -51,7 +51,7 @@ export async function generateStudyPlan(input: StudyPlanInput): Promise<StudyPla
 // Define the Genkit prompt for the AI model
 const studyPlannerPrompt = ai.definePrompt({
   name: "studyPlannerPrompt",
-  model: "googleai/gemini-2.5-flash",
+  model: "googleai/gemini-1.5-flash-latest",
   input: { schema: StudyPlanInputSchema },
   output: { schema: StudyPlanSchema },
   prompt: `

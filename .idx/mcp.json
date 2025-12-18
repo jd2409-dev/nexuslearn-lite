@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "llm_council": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/llm_council",
+        "run",
+        "lm-council-mcp"
+      ],
+      "env": {
+        // Add keys here only if llm_council needs them, e.g. OPENAI_API_KEY, etc.
+      },
+      "timeout": 30000,
+      "trust": true,
+      "description": "Multi‑LLM council server exposed to Gemini via MCP"
+    }
+  }
+}

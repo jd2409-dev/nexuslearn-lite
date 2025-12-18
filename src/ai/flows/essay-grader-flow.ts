@@ -47,7 +47,7 @@ export async function gradeEssay(input: GradeEssayInput): Promise<GradeEssayOutp
 // Define the Genkit prompt for the AI model
 const essayGraderPrompt = ai.definePrompt({
   name: "essayGraderPrompt",
-  model: 'googleai/gemini-2.5-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: { schema: GradeEssayInputSchema },
   output: { schema: GradeEssayOutputSchema },
   prompt: `
