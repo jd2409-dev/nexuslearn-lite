@@ -28,7 +28,7 @@ export default function EssayGraderPage() {
       setIsLoading(false);
     }
   };
-  
+
   const handleCopyFeedback = () => {
     if (!result) return;
     const feedbackText = `
@@ -95,11 +95,11 @@ ${result.revisedEssay}
           <Card className="min-h-full">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                 <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <Star className="text-primary" />
                   <span>Feedback</span>
                 </div>
-                 {result && (
+                {result && (
                   <Button variant="ghost" size="icon" onClick={handleCopyFeedback}>
                     {copied ? <Check className="h-4 w-4 text-green-500" /> : <Clipboard className="h-4 w-4" />}
                   </Button>
@@ -119,18 +119,18 @@ ${result.revisedEssay}
                   <div>
                     <h3 className="font-semibold text-lg">Overall Grade: {result.grade}</h3>
                   </div>
-                  
+
                   <div className="p-4 border rounded-lg bg-secondary/50">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                        {result.aiDetection.isLikelyAiGenerated ? (
-                            <ShieldAlert className="h-5 w-5 text-destructive" />
-                        ) : (
-                            <ShieldCheck className="h-5 w-5 text-green-600" />
-                        )}
-                       AI Content Analysis
+                      {result.aiDetection.isLikelyAiGenerated ? (
+                        <ShieldAlert className="h-5 w-5 text-destructive" />
+                      ) : (
+                        <ShieldCheck className="h-5 w-5 text-green-600" />
+                      )}
+                      AI Content Analysis
                     </h3>
                     <Badge variant={result.aiDetection.isLikelyAiGenerated ? 'destructive' : 'secondary'}>
-                        {result.aiDetection.isLikelyAiGenerated ? 'Likely AI-Generated' : 'Likely Human-Written'}
+                      {result.aiDetection.isLikelyAiGenerated ? 'Likely AI-Generated' : 'Likely Human-Written'}
                     </Badge>
                     <p className="text-muted-foreground text-sm mt-2">{result.aiDetection.explanation}</p>
                   </div>
@@ -151,7 +151,7 @@ ${result.revisedEssay}
                       ))}
                     </ul>
                   </div>
-                   <div>
+                  <div>
                     <h3 className="font-semibold text-lg mb-2">Detailed Feedback</h3>
                     <p className="text-muted-foreground whitespace-pre-wrap">{result.detailedFeedback}</p>
                   </div>
@@ -169,7 +169,7 @@ ${result.revisedEssay}
                     Your feedback will appear here
                   </h2>
                   <p className="mt-2 text-muted-foreground">
-                    Paste your essay and click "Grade My Essay" to get started.
+                    Paste your essay and click &quot;Grade My Essay&quot; to get started.
                   </p>
                 </div>
               )}
